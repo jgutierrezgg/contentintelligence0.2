@@ -11,24 +11,45 @@ import CampaignDetail from './components/campaign/CampaignDetail'
 
 const ONBOARDING_STEPS = ['workspace', 'brands', 'connections']
 
+const BLANK_ONBOARDING = {
+  active: true,
+  step: 'workspace',
+  name: null,
+  brands: [],
+  connections: { ga: false, gsc: false, semrush: false },
+}
+
+const INITIAL_STATE = {
+  workspaces: [],
+  activeWsId: null,
+  onboarding: BLANK_ONBOARDING,
+}
+
 function loadState() {
   try {
     const raw = localStorage.getItem('ci_state')
-    return raw ? JSON.parse(raw) : null
+    if (!raw) return null
+    const s = JSON.parse(raw)
+    // Migrate old format (had workspace/brands/campaigns/connections at root)
+    if (s && !s.workspaces) {
+      if (s.onboardingDone && s.workspace) {
+        const ws = {
+          id: Date.now(),
+          name: s.workspace,
+          brands: s.brands ?? [],
+          campaigns: s.campaigns ?? [],
+          connections: s.connections ?? { ga: false, gsc: false, semrush: false },
+        }
+        return { workspaces: [ws], activeWsId: ws.id, onboarding: { ...BLANK_ONBOARDING, active: false } }
+      }
+      return null
+    }
+    return s
   } catch { return null }
 }
 
 function saveState(state) {
   try { localStorage.setItem('ci_state', JSON.stringify(state)) } catch {}
-}
-
-const INITIAL_STATE = {
-  onboardingStep: 'workspace',
-  onboardingDone: false,
-  workspace: null,
-  brands: [],
-  campaigns: [],
-  connections: { ga: false, gsc: false, semrush: false },
 }
 
 export default function App() {
@@ -44,27 +65,95 @@ export default function App() {
     })
   }
 
-  if (!state.onboardingDone) {
+  const updateOnboarding = (patch) =>
+    setState(s => {
+      const next = { ...s, onboarding: { ...s.onboarding, ...patch } }
+      saveState(next)
+      return next
+    })
+
+  // ── Onboarding handlers ──────────────────────────────────────────────────
+  const handleWorkspaceName = (name) => updateOnboarding({ name, step: 'brands' })
+  const handleBrands = (brands) => updateOnboarding({ brands, step: 'connections' })
+  const handleConnections = (connected) => {
+    setState(s => {
+      const ws = {
+        id: Date.now(),
+        name: s.onboarding.name,
+        brands: s.onboarding.brands,
+        campaigns: [],
+        connections: {
+          ga: !!connected.ga,
+          gsc: !!connected.gsc,
+          semrush: !!connected.semrush,
+        },
+      }
+      const next = {
+        ...s,
+        workspaces: [...s.workspaces, ws],
+        activeWsId: ws.id,
+        onboarding: { ...BLANK_ONBOARDING, active: false },
+      }
+      saveState(next)
+      return next
+    })
+    setView('campaigns')
+    setSelectedCampaign(null)
+  }
+
+  if (state.onboarding.active) {
     return (
-      <OnboardingShell step={state.onboardingStep}>
-        {state.onboardingStep === 'workspace'   && <StepWorkspace   onNext={(name)    => update({ workspace: name,  onboardingStep: 'brands' })} />}
-        {state.onboardingStep === 'brands'      && <StepBrands      onNext={(brands)  => update({ brands,           onboardingStep: 'connections' })} />}
-        {state.onboardingStep === 'connections' && <StepConnections onNext={() =>       update({ onboardingDone: true })} />}
+      <OnboardingShell step={state.onboarding.step}>
+        {state.onboarding.step === 'workspace'   && <StepWorkspace   onNext={handleWorkspaceName} />}
+        {state.onboarding.step === 'brands'      && <StepBrands      onNext={handleBrands} />}
+        {state.onboarding.step === 'connections' && <StepConnections onNext={handleConnections} />}
       </OnboardingShell>
     )
   }
 
-  const handleSelectCampaign  = (c)  => { setSelectedCampaign(c); setView('campaigns') }
-  const handleUpdateCampaign  = (u)  => { update({ campaigns: state.campaigns.map(c => c.id === u.id ? u : c) }); setSelectedCampaign(u) }
-  const handleCreateCampaign  = (c)  => update({ campaigns: [...state.campaigns, c] })
-  const handleToggleConnection = (id) => update({ connections: { ...state.connections, [id]: !state.connections[id] } })
+  // ── Active workspace ─────────────────────────────────────────────────────
+  const ws = state.workspaces.find(w => w.id === state.activeWsId)
+
+  const updateWs = (patch) =>
+    setState(s => {
+      const next = {
+        ...s,
+        workspaces: s.workspaces.map(w => w.id === s.activeWsId ? { ...w, ...patch } : w),
+      }
+      saveState(next)
+      return next
+    })
+
+  const handleSelectCampaign   = (c) => { setSelectedCampaign(c); setView('campaigns') }
+  const handleUpdateCampaign   = (u) => { updateWs({ campaigns: ws.campaigns.map(c => c.id === u.id ? u : c) }); setSelectedCampaign(u) }
+  const handleCreateCampaign   = (c) => updateWs({ campaigns: [...ws.campaigns, c] })
+  const handleToggleConnection = (id) => updateWs({ connections: { ...ws.connections, [id]: !ws.connections[id] } })
+
+  // ── Workspace management ─────────────────────────────────────────────────
+  const handleAddWorkspace = () => {
+    update({ onboarding: BLANK_ONBOARDING })
+    setView('campaigns')
+    setSelectedCampaign(null)
+  }
+  const handleSelectWorkspace = (id) => {
+    update({ activeWsId: id })
+    setView('campaigns')
+    setSelectedCampaign(null)
+  }
 
   return (
-    <AppShell view={view} onNavigate={(v) => { setView(v); setSelectedCampaign(null) }}>
+    <AppShell
+      view={view}
+      onNavigate={(v) => { setView(v); setSelectedCampaign(null) }}
+      workspaces={state.workspaces}
+      activeWsId={state.activeWsId}
+      onSelectWorkspace={handleSelectWorkspace}
+      onAddWorkspace={handleAddWorkspace}
+    >
       {view === 'campaigns' && !selectedCampaign && (
         <Dashboard
-          campaigns={state.campaigns}
-          brands={state.brands}
+          campaigns={ws.campaigns}
+          brands={ws.brands}
           onSelectCampaign={handleSelectCampaign}
           onCreateCampaign={handleCreateCampaign}
         />
@@ -78,13 +167,13 @@ export default function App() {
       )}
       {view === 'brands' && (
         <BrandsView
-          brands={state.brands}
-          onAddBrand={(b) => update({ brands: [...state.brands, b] })}
-          onRemoveBrand={(id) => update({ brands: state.brands.filter(b => b.id !== id) })}
+          brands={ws.brands}
+          onAddBrand={(b) => updateWs({ brands: [...ws.brands, b] })}
+          onRemoveBrand={(id) => updateWs({ brands: ws.brands.filter(b => b.id !== id) })}
         />
       )}
       {view === 'connections' && (
-        <ConnectionsView connections={state.connections} onToggle={handleToggleConnection} />
+        <ConnectionsView connections={ws.connections} onToggle={handleToggleConnection} />
       )}
     </AppShell>
   )

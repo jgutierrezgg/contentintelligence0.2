@@ -42,7 +42,7 @@ export default function StepConnections({ onNext }) {
         })}
       </div>
 
-      <Btn onClick={onNext} disabled={!allConnected}>Enter platform →</Btn>
+      <Btn onClick={() => onNext(connected)} disabled={!allConnected}>Enter platform →</Btn>
       {!allConnected && (
         <p className={styles.connWarning}>All three connections are required to continue.</p>
       )}
