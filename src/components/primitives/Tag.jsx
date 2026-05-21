@@ -1,16 +1,15 @@
-import { C } from '../../constants/colors'
+import styles from './Tag.module.css'
 
-export default function Tag({ children, color, bg, style }) {
+export default function Tag({ children, variant = 'default', onClick, className = '' }) {
+  const cls = [
+    styles.tag,
+    variant !== 'default' ? styles[variant] : '',
+    onClick ? styles.clickable : '',
+    className,
+  ].filter(Boolean).join(' ')
+
   return (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 4,
-      padding: '2px 8px', borderRadius: 20,
-      fontSize: 11, fontWeight: 600, letterSpacing: '0.04em',
-      color: color ?? C.textMuted,
-      background: bg ?? C.surfaceHigh,
-      border: `1px solid ${C.border}`,
-      ...style,
-    }}>
+    <span className={cls} onClick={onClick}>
       {children}
     </span>
   )

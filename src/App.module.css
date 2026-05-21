@@ -1,0 +1,81 @@
+.onboarding {
+  min-height: 100vh;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+}
+
+.onboardingLogo {
+  margin-bottom: 48px;
+  text-align: center;
+}
+
+.onboardingLogoName {
+  font-size: var(--font-2xl);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.onboardingLogoSub {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.stepIndicators {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: 40px;
+  align-items: center;
+}
+
+.stepIndicatorGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.stepDot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  border: 2px solid var(--color-border);
+  background: var(--color-surface-high);
+  color: var(--color-text-muted);
+}
+
+.stepDot.done {
+  background: var(--color-green);
+  border-color: var(--color-green);
+  color: #fff;
+}
+
+.stepDot.current {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.stepConnector {
+  width: 32px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--color-border);
+}
+
+.stepConnector.done {
+  background: var(--color-green);
+}
+
+.stepContent {
+  width: 100%;
+  max-width: 600px;
+}

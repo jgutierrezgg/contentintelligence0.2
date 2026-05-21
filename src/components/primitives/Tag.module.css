@@ -1,0 +1,54 @@
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  background: var(--color-surface-high);
+}
+
+/* ── Semantic variants ── */
+.accent {
+  color: var(--color-accent-soft);
+  background: var(--color-accent-glow);
+  border-color: rgba(var(--rgb-accent), 0.27);
+}
+
+.green {
+  color: var(--color-green);
+  background: rgba(var(--rgb-green), 0.08);
+  border-color: rgba(var(--rgb-green), 0.27);
+}
+
+.blue {
+  color: var(--color-blue);
+  background: rgba(var(--rgb-blue), 0.08);
+  border-color: rgba(var(--rgb-blue), 0.27);
+}
+
+.orange {
+  color: var(--color-orange);
+  background: rgba(var(--rgb-orange), 0.08);
+  border-color: rgba(var(--rgb-orange), 0.27);
+}
+
+.red {
+  color: var(--color-red);
+  background: rgba(var(--rgb-red), 0.08);
+  border-color: rgba(var(--rgb-red), 0.27);
+}
+
+/* ── Interactive (used in competitor selection) ── */
+.clickable {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.clickable:hover {
+  border-color: var(--color-border-light);
+}

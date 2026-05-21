@@ -1,17 +1,11 @@
-import { useState, useEffect } from 'react'
-import { C } from '../../constants/colors'
+import { useState } from 'react'
+import styles from './onboarding.module.css'
 import Input from '../primitives/Input'
 import Btn from '../primitives/Btn'
 import AgentBubble from '../primitives/AgentBubble'
 import Tag from '../primitives/Tag'
 
-const STAGES = {
-  URL: 'url',
-  ANALYZING: 'analyzing',
-  PROFILE: 'profile',
-  COMPETITORS: 'competitors',
-  DONE: 'done',
-}
+const STAGES = { URL: 'url', ANALYZING: 'analyzing', PROFILE: 'profile', COMPETITORS: 'competitors' }
 
 const SUGGESTED_COMPETITORS = [
   'hubspot.com', 'mailchimp.com', 'marketo.com', 'pardot.com', 'activecampaign.com',
@@ -62,101 +56,92 @@ export default function AddBrandFlow({ onAdd, onCancel }) {
   }
 
   const finalize = () => {
-    const brand = {
+    onAdd({
       id: Date.now(),
       ...profile,
       competitors: competitors.filter(c => c.selected).map(c => c.domain),
-    }
-    onAdd(brand)
+    })
   }
 
+  const toggleCompetitor = (i) =>
+    setCompetitors(prev => prev.map((x, j) => j === i ? { ...x, selected: !x.selected } : x))
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div className={styles.urlForm}>
       {/* Agent chat */}
-      <div style={{
-        background: C.surfaceHigh, borderRadius: 10,
-        border: `1px solid ${C.border}`, padding: 16,
-        maxHeight: 260, overflowY: 'auto',
-      }}>
+      <div className={styles.agentChat}>
         {agentMessages.length === 0 && !typing && (
-          <p style={{ color: C.textMuted, fontSize: 13 }}>
+          <p className={styles.agentEmpty}>
             The AI agent will analyze your brand once you provide a URL.
           </p>
         )}
-        {agentMessages.map((msg, i) => (
-          <AgentBubble key={i} text={msg} />
-        ))}
+        {agentMessages.map((msg, i) => <AgentBubble key={i} text={msg} />)}
         {typing && <AgentBubble typing />}
       </div>
 
-      {/* Stage: URL entry */}
+      {/* URL entry */}
       {stage === STAGES.URL && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <>
           <Input value={url} onChange={setUrl} placeholder="Brand website URL (e.g. https://example.com)" />
           <Input value={extraUrls} onChange={setExtraUrls} placeholder="Additional URLs (optional, comma-separated)" />
-          <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
+          <div className={styles.urlActions}>
             <Btn onClick={startAnalysis} disabled={!url.trim()}>Analyze brand</Btn>
             <Btn variant="ghost" onClick={onCancel}>Cancel</Btn>
           </div>
-        </div>
+        </>
       )}
 
-      {/* Stage: analyzing — no UI, agent chat handles it */}
+      {/* Analyzing */}
       {stage === STAGES.ANALYZING && (
-        <div style={{ color: C.textMuted, fontSize: 13 }}>Analyzing…</div>
+        <p className={styles.analyzingText}>Analyzing…</p>
       )}
 
-      {/* Stage: profile review */}
+      {/* Profile review */}
       {stage === STAGES.PROFILE && profile && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{
-            background: C.surface, border: `1px solid ${C.border}`,
-            borderRadius: 8, padding: 14,
-          }}>
-            <Row label="Name" value={profile.name} />
-            <Row label="Industry" value={profile.industry} />
-            <Row label="Value Proposition" value={profile.valueProposition} />
-            <Row label="Tone" value={profile.tone} />
-            <Row label="Products" value={profile.products.join(', ')} />
+        <>
+          <div className={styles.profileCard}>
+            <ProfileRow label="Name"              value={profile.name} />
+            <ProfileRow label="Industry"          value={profile.industry} />
+            <ProfileRow label="Value Proposition" value={profile.valueProposition} />
+            <ProfileRow label="Tone"              value={profile.tone} />
+            <ProfileRow label="Products"          value={profile.products.join(', ')} />
           </div>
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div className={styles.profileActions}>
             <Btn onClick={confirmProfile}>Confirm profile →</Btn>
             <Btn variant="secondary" size="sm" onClick={() => setStage(STAGES.URL)}>Edit URL</Btn>
           </div>
-        </div>
+        </>
       )}
 
-      {/* Stage: competitor validation */}
+      {/* Competitor selection */}
       {stage === STAGES.COMPETITORS && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <>
+          <div className={styles.competitorList}>
             {competitors.map((c, i) => (
               <Tag
                 key={c.domain}
-                color={c.selected ? C.green : C.textMuted}
-                bg={c.selected ? `${C.green}15` : C.surfaceHigh}
-                style={{ cursor: 'pointer', border: `1px solid ${c.selected ? C.green + '44' : C.border}` }}
+                variant={c.selected ? 'green' : 'default'}
+                onClick={() => toggleCompetitor(i)}
+                className={[styles.competitorTag, c.selected ? styles.selected : ''].filter(Boolean).join(' ')}
               >
-                <span onClick={() => setCompetitors(prev => prev.map((x, j) => j === i ? { ...x, selected: !x.selected } : x))}>
-                  {c.selected ? '✓ ' : ''}{c.domain}
-                </span>
+                {c.selected ? '✓ ' : ''}{c.domain}
               </Tag>
             ))}
           </div>
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div className={styles.competitorActions}>
             <Btn onClick={finalize}>Add brand →</Btn>
           </div>
-        </div>
+        </>
       )}
     </div>
   )
 }
 
-function Row({ label, value }) {
+function ProfileRow({ label, value }) {
   return (
-    <div style={{ display: 'flex', gap: 12, marginBottom: 8, fontSize: 13 }}>
-      <span style={{ color: C.textMuted, width: 140, flexShrink: 0 }}>{label}</span>
-      <span style={{ color: C.text }}>{value}</span>
+    <div className={styles.profileRow}>
+      <span className={styles.profileLabel}>{label}</span>
+      <span className={styles.profileValue}>{value}</span>
     </div>
   )
 }

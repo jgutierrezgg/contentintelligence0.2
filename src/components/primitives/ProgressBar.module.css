@@ -1,0 +1,21 @@
+.bar {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.segment {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-border);
+  transition: background var(--transition-slow);
+}
+
+.done {
+  background: var(--color-green);
+}
+
+.current {
+  background: var(--color-accent);
+}

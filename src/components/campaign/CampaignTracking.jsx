@@ -1,81 +1,60 @@
-import { C } from '../../constants/colors'
+import styles from './campaign.module.css'
 import Tag from '../primitives/Tag'
 import { PhaseHeader } from './CampaignResearch'
 
 const METRICS = [
-  { label: 'Organic Traffic', value: '12,480', delta: '+18%', color: C.green },
-  { label: 'Keyword Rankings', value: '284', delta: '+47', color: C.blue },
-  { label: 'Leads Generated', value: '163', delta: '+23%', color: C.orange },
-  { label: 'Avg. Position', value: '8.4', delta: '↓2.1', color: C.accentSoft },
+  { label: 'Organic Traffic',   value: '12,480', delta: '+18%',  colorVar: 'var(--color-green)',       variant: 'green' },
+  { label: 'Keyword Rankings',  value: '284',    delta: '+47',   colorVar: 'var(--color-blue)',        variant: 'blue' },
+  { label: 'Leads Generated',   value: '163',    delta: '+23%',  colorVar: 'var(--color-orange)',      variant: 'orange' },
+  { label: 'Avg. Position',     value: '8.4',    delta: '↓2.1',  colorVar: 'var(--color-accent-soft)', variant: 'accent' },
 ]
 
 const CONTENT_ITEMS = [
-  { title: 'Ultimate Guide to Content Strategy', status: 'Published' },
-  { title: 'Email Marketing Best Practices', status: 'In Progress' },
-  { title: 'How to Improve Organic Rankings', status: 'In Progress' },
-  { title: 'Landing Page Optimization Tips', status: 'Pending' },
-  { title: 'Product Comparison Page', status: 'Pending' },
+  { title: 'Ultimate Guide to Content Strategy', status: 'Published',   variant: 'green',  progress: 100 },
+  { title: 'Email Marketing Best Practices',     status: 'In Progress', variant: 'blue',   progress:  55 },
+  { title: 'How to Improve Organic Rankings',    status: 'In Progress', variant: 'blue',   progress:  55 },
+  { title: 'Landing Page Optimization Tips',     status: 'Pending',     variant: 'default', progress:  0 },
+  { title: 'Product Comparison Page',            status: 'Pending',     variant: 'default', progress:  0 },
 ]
 
-const STATUS_COLORS = {
-  Published: C.green,
-  'In Progress': C.blue,
-  Pending: C.textMuted,
+const PROGRESS_COLOR = {
+  Published:   'var(--color-green)',
+  'In Progress':'var(--color-blue)',
+  Pending:     'var(--color-text-muted)',
 }
 
 export default function CampaignTracking() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-      <PhaseHeader
-        icon="🟢"
-        title="Tracking"
-        subtitle="Real-time performance metrics and content execution status."
-      />
+    <div className={styles.phaseStack}>
+      <PhaseHeader icon="🟢" title="Tracking" subtitle="Real-time performance metrics and content execution status." />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+      <div className={styles.metricsGrid}>
         {METRICS.map(m => (
-          <div key={m.label} style={{
-            padding: 16, borderRadius: 10,
-            background: C.surface, border: `1px solid ${C.border}`,
-            textAlign: 'center',
-          }}>
-            <div style={{ fontSize: 24, fontWeight: 700, color: m.color }}>{m.value}</div>
-            <div style={{ fontSize: 11, color: C.textMuted, margin: '4px 0' }}>{m.label}</div>
-            <div style={{ fontSize: 12, color: m.color }}>{m.delta}</div>
+          <div key={m.label} className={styles.metricCard}>
+            <div className={styles.metricValue} style={{ color: m.colorVar }}>{m.value}</div>
+            <div className={styles.metricLabel}>{m.label}</div>
+            <div className={styles.metricDelta} style={{ color: m.colorVar }}>{m.delta}</div>
           </div>
         ))}
       </div>
 
-      <div>
-        <div style={{
-          fontSize: 11, fontWeight: 600, color: C.textMuted,
-          textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12,
-        }}>
-          Content Status
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {CONTENT_ITEMS.map(item => {
-            const color = STATUS_COLORS[item.status]
-            const progress = item.status === 'Published' ? 100 : item.status === 'In Progress' ? 55 : 0
-            return (
-              <div key={item.title} style={{
-                padding: '12px 14px', borderRadius: 8,
-                background: C.surfaceHigh, border: `1px solid ${C.border}`,
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <span style={{ fontSize: 13 }}>{item.title}</span>
-                  <Tag color={color} bg={`${color}15`}>{item.status}</Tag>
-                </div>
-                <div style={{ height: 3, borderRadius: 2, background: C.border, overflow: 'hidden' }}>
-                  <div style={{
-                    height: '100%', width: `${progress}%`,
-                    background: color, borderRadius: 2,
-                    transition: 'width 0.5s',
-                  }} />
-                </div>
+      <div className={styles.contentStatusSection}>
+        <div className={styles.contentStatusLabel}>Content Status</div>
+        <div className={styles.contentList}>
+          {CONTENT_ITEMS.map(item => (
+            <div key={item.title} className={styles.contentItem}>
+              <div className={styles.contentItemTop}>
+                <span className={styles.contentItemTitle}>{item.title}</span>
+                <Tag variant={item.variant}>{item.status}</Tag>
               </div>
-            )
-          })}
+              <div className={styles.progressTrack}>
+                <div
+                  className={styles.progressFill}
+                  style={{ width: `${item.progress}%`, background: PROGRESS_COLOR[item.status] }}
+                />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

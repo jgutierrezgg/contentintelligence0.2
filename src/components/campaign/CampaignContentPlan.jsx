@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { C } from '../../constants/colors'
+import styles from './campaign.module.css'
 import AutoProcess from '../primitives/AutoProcess'
-import Tag from '../primitives/Tag'
 import { PhaseHeader, ApprovalGate } from './CampaignResearch'
 
 const PLAN_STEPS = [
@@ -20,46 +19,24 @@ export default function CampaignContentPlan({ onApprove }) {
   const [planDone, setPlanDone] = useState(false)
   const [approved, setApproved] = useState(false)
 
-  if (approved) {
-    return (
-      <div style={{ color: C.green, fontWeight: 600, padding: 16 }}>
-        ✓ Content plan approved — execution underway.
-      </div>
-    )
-  }
+  if (approved) return <div className={styles.approved}>✓ Content plan approved — execution underway.</div>
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <PhaseHeader
-        icon="🟢"
-        title="Content Plan"
-        subtitle="Opportunities sorted by impact and assigned to a weekly execution schedule."
-      />
+    <div className={styles.phaseStack}>
+      <PhaseHeader icon="🟢" title="Content Plan" subtitle="Opportunities sorted by impact and assigned to a weekly execution schedule." />
 
       {!planDone ? (
         <AutoProcess steps={PLAN_STEPS} onComplete={() => setPlanDone(true)} />
       ) : (
         <>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div className={styles.weekSection}>
             {MOCK_PLAN.map(week => (
               <div key={week.week}>
-                <div style={{
-                  fontSize: 11, fontWeight: 600, color: C.textMuted,
-                  textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8,
-                }}>
-                  Week {week.week}
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div className={styles.weekLabel}>Week {week.week}</div>
+                <div className={styles.planItems}>
                   {week.items.map(item => (
-                    <div
-                      key={item}
-                      style={{
-                        padding: '10px 14px', borderRadius: 8,
-                        background: C.surfaceHigh, border: `1px solid ${C.border}`,
-                        fontSize: 13, display: 'flex', alignItems: 'center', gap: 10,
-                      }}
-                    >
-                      <span style={{ color: C.textMuted }}>≡</span>
+                    <div key={item} className={styles.planItem}>
+                      <span className={styles.planHandle}>≡</span>
                       {item}
                     </div>
                   ))}

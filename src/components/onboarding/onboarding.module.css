@@ -1,0 +1,204 @@
+/* ── Shared onboarding layout ── */
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.containerMd {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.containerLg {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.heading {
+  font-size: var(--font-4xl);
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+}
+
+.lead {
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-8);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  margin-top: var(--space-5);
+}
+
+.hint {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+/* ── StepBrands brand list ── */
+.brandList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: var(--space-5);
+}
+
+.brandCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brandAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--color-accent-glow);
+  border: 1px solid var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--color-accent);
+  font-size: var(--font-md);
+  flex-shrink: 0;
+}
+
+.brandMeta {
+  flex: 1;
+}
+
+.brandName {
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+}
+
+.brandTags {
+  display: flex;
+  gap: var(--space-1);
+}
+
+/* ── StepConnections ── */
+.connList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
+}
+
+.connCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.connIcon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.connBody {
+  flex: 1;
+}
+
+.connName {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.connDesc {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+.connWarning {
+  margin-top: 10px;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+/* ── AddBrandFlow ── */
+.agentChat {
+  background: var(--color-surface-high);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  padding: var(--space-4);
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.agentEmpty {
+  color: var(--color-text-muted);
+  font-size: var(--font-base);
+}
+
+.urlForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.urlActions {
+  display: flex;
+  gap: 10px;
+  margin-top: var(--space-1);
+}
+
+.analyzingText {
+  color: var(--color-text-muted);
+  font-size: var(--font-base);
+}
+
+.profileCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+
+.profileRow {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+  font-size: var(--font-base);
+}
+
+.profileLabel {
+  color: var(--color-text-muted);
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.profileValue {
+  color: var(--color-text);
+}
+
+.profileActions {
+  display: flex;
+  gap: 10px;
+}
+
+.competitorList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.competitorActions {
+  display: flex;
+  gap: 10px;
+}
+
+/* ── Competitor tag variants ── */
+.competitorTag {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.competitorTag.selected {
+  color: var(--color-green);
+  background: rgba(var(--rgb-green), 0.08);
+  border-color: rgba(var(--rgb-green), 0.27);
+}

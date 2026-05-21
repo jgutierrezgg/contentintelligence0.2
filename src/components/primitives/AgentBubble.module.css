@@ -1,0 +1,52 @@
+.row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: var(--space-3);
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-accent-glow);
+  border: 1px solid var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-xs);
+  margin-top: 2px;
+  color: var(--color-accent-soft);
+  font-weight: 700;
+}
+
+.bubble {
+  background: var(--color-surface-high);
+  border: 1px solid var(--color-border);
+  border-radius: 0 10px 10px 10px;
+  padding: 10px 14px;
+  font-size: var(--font-base);
+  line-height: 1.6;
+  color: var(--color-text);
+  max-width: 85%;
+}
+
+/* ── Typing indicator ── */
+.dots {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  display: inline-block;
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}
+
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }

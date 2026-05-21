@@ -1,20 +1,15 @@
-import { C } from '../../constants/colors'
+import styles from './dashboard.module.css'
 
-const STATUS_STYLES = {
-  Setup:      { color: C.orange,  bg: `${C.orange}18`  },
-  Active:     { color: C.green,   bg: `${C.green}18`   },
-  Completed:  { color: C.blue,    bg: `${C.blue}18`    },
+const VARIANT = {
+  Setup:     'setup',
+  Active:    'active',
+  Completed: 'completed',
 }
 
 export default function StatusPill({ status }) {
-  const s = STATUS_STYLES[status] ?? { color: C.textMuted, bg: C.surfaceHigh }
+  const variant = VARIANT[status] ?? ''
   return (
-    <span style={{
-      display: 'inline-block',
-      padding: '2px 10px', borderRadius: 20,
-      fontSize: 11, fontWeight: 700, letterSpacing: '0.05em',
-      color: s.color, background: s.bg,
-    }}>
+    <span className={[styles.pill, variant ? styles[variant] : ''].filter(Boolean).join(' ')}>
       {status}
     </span>
   )

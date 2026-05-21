@@ -1,0 +1,60 @@
+:root {
+  /* ── Colors ── */
+  --color-bg:           #07080d;
+  --color-surface:      #0e0f17;
+  --color-surface-high: #13141f;
+  --color-border:       #1a1b2e;
+  --color-border-light: #252640;
+  --color-accent:       #7c6af7;
+  --color-accent-glow:  rgba(124, 106, 247, 0.13);
+  --color-accent-soft:  #9d8fff;
+  --color-green:        #10d98a;
+  --color-orange:       #f5a623;
+  --color-red:          #f04f5a;
+  --color-blue:         #4a9eff;
+  --color-text:         #dde1f0;
+  --color-text-muted:   #5a607a;
+  --color-text-dim:     #272a3d;
+
+  /* RGB channels — for composing rgba() with arbitrary alpha */
+  --rgb-accent:  124, 106, 247;
+  --rgb-green:   16, 217, 138;
+  --rgb-orange:  245, 166, 35;
+  --rgb-red:     240, 79, 90;
+  --rgb-blue:    74, 158, 255;
+
+  /* ── Typography ── */
+  --font-family: 'Outfit', sans-serif;
+  --font-xs:  11px;
+  --font-sm:  12px;
+  --font-base: 13px;
+  --font-md:  14px;
+  --font-lg:  16px;
+  --font-xl:  18px;
+  --font-2xl: 20px;
+  --font-3xl: 22px;
+  --font-4xl: 24px;
+
+  /* ── Spacing ── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-7:  28px;
+  --space-8:  32px;
+
+  /* ── Radii ── */
+  --radius-sm:   6px;
+  --radius-md:   8px;
+  --radius-lg:   10px;
+  --radius-xl:   12px;
+  --radius-2xl:  16px;
+  --radius-full: 9999px;
+
+  /* ── Transitions ── */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.3s ease;
+}

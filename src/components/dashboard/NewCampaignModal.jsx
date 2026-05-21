@@ -1,14 +1,11 @@
 import { useState } from 'react'
-import { C } from '../../constants/colors'
+import styles from './dashboard.module.css'
 import { MARKETS, OBJECTIVES, CONFLICTING_PAIRS } from '../../constants/campaign'
 import Input from '../primitives/Input'
 import Btn from '../primitives/Btn'
-import Tag from '../primitives/Tag'
 
 function hasConflict(selected) {
-  return CONFLICTING_PAIRS.some(
-    ([a, b]) => selected.includes(a) && selected.includes(b)
-  )
+  return CONFLICTING_PAIRS.some(([a, b]) => selected.includes(a) && selected.includes(b))
 }
 
 export default function NewCampaignModal({ brands, onCreate, onClose }) {
@@ -17,12 +14,8 @@ export default function NewCampaignModal({ brands, onCreate, onClose }) {
   const [selectedMarkets, setSelectedMarkets] = useState([])
   const [selectedObjectives, setSelectedObjectives] = useState([])
 
-  const toggleBrand = (b) => setSelectedBrands(s =>
-    s.includes(b) ? s.filter(x => x !== b) : [...s, b]
-  )
-  const toggleMarket = (m) => setSelectedMarkets(s =>
-    s.includes(m) ? s.filter(x => x !== m) : [...s, m]
-  )
+  const toggleBrand = (b) => setSelectedBrands(s => s.includes(b) ? s.filter(x => x !== b) : [...s, b])
+  const toggleMarket = (m) => setSelectedMarkets(s => s.includes(m) ? s.filter(x => x !== m) : [...s, m])
   const toggleObjective = (id) => {
     if (selectedObjectives.includes(id)) {
       setSelectedObjectives(s => s.filter(x => x !== id))
@@ -48,54 +41,53 @@ export default function NewCampaignModal({ brands, onCreate, onClose }) {
   }
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0, background: '#00000088',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100,
-    }}
-      onClick={e => e.target === e.currentTarget && onClose()}
-    >
-      <div style={{
-        background: C.surface, border: `1px solid ${C.border}`,
-        borderRadius: 16, padding: 28, width: 560, maxHeight: '90vh', overflowY: 'auto',
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 700 }}>New Campaign</h3>
+    <div className={styles.overlay} onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className={styles.modal}>
+        <div className={styles.modalHeader}>
+          <h3 className={styles.modalTitle}>New Campaign</h3>
           <Btn variant="ghost" onClick={onClose} style={{ fontSize: 18, padding: '4px 8px' }}>✕</Btn>
         </div>
 
-        <Section label="Campaign name">
+        <div className={styles.section}>
+          <div className={styles.sectionLabel}>Campaign name</div>
           <Input value={name} onChange={setName} placeholder="e.g. Q3 Organic Growth" />
-        </Section>
+        </div>
 
-        <Section label="Brands">
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <div className={styles.section}>
+          <div className={styles.sectionLabel}>Brands</div>
+          <div className={styles.tagRow}>
             {brands.map(b => (
-              <ToggleTag
+              <span
                 key={b.id}
-                label={b.name}
-                selected={selectedBrands.includes(b.name)}
-                onToggle={() => toggleBrand(b.name)}
-                activeColor={C.accentSoft}
-                activeBg={C.accentGlow}
-              />
+                onClick={() => toggleBrand(b.name)}
+                className={[styles.toggleTag, selectedBrands.includes(b.name) ? styles.selectedAccent : ''].filter(Boolean).join(' ')}
+              >
+                {selectedBrands.includes(b.name) && <span style={{ marginRight: 4 }}>✓</span>}
+                {b.name}
+              </span>
             ))}
           </div>
-        </Section>
+        </div>
 
-        <Section label="Markets">
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <div className={styles.section}>
+          <div className={styles.sectionLabel}>Markets</div>
+          <div className={styles.tagRow}>
             {MARKETS.map(m => (
-              <ToggleTag
-                key={m} label={m}
-                selected={selectedMarkets.includes(m)}
-                onToggle={() => toggleMarket(m)}
-              />
+              <span
+                key={m}
+                onClick={() => toggleMarket(m)}
+                className={[styles.toggleTag, selectedMarkets.includes(m) ? styles.selectedGreen : ''].filter(Boolean).join(' ')}
+              >
+                {selectedMarkets.includes(m) && <span style={{ marginRight: 4 }}>✓</span>}
+                {m}
+              </span>
             ))}
           </div>
-        </Section>
+        </div>
 
-        <Section label={`Objectives (max 2)`}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div className={styles.section}>
+          <div className={styles.sectionLabel}>Objectives (max 2)</div>
+          <div className={styles.objectiveList}>
             {OBJECTIVES.map(obj => {
               const sel = selectedObjectives.includes(obj.id)
               const disabled = !sel && selectedObjectives.length >= 2
@@ -103,17 +95,11 @@ export default function NewCampaignModal({ brands, onCreate, onClose }) {
                 <div
                   key={obj.id}
                   onClick={() => !disabled && toggleObjective(obj.id)}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '9px 14px', borderRadius: 8,
-                    background: sel ? C.accentGlow : C.surfaceHigh,
-                    border: `1px solid ${sel ? C.accent + '66' : C.border}`,
-                    cursor: disabled ? 'not-allowed' : 'pointer',
-                    opacity: disabled ? 0.5 : 1,
-                    transition: 'all 0.15s',
-                    fontSize: 13,
-                    color: sel ? C.accentSoft : C.text,
-                  }}
+                  className={[
+                    styles.objective,
+                    sel      ? styles.selected : '',
+                    disabled ? styles.disabled : '',
+                  ].filter(Boolean).join(' ')}
                 >
                   <span>{sel ? '◉' : '○'}</span>
                   {obj.label}
@@ -122,53 +108,17 @@ export default function NewCampaignModal({ brands, onCreate, onClose }) {
             })}
           </div>
           {conflict && (
-            <div style={{
-              marginTop: 10, padding: '10px 14px', borderRadius: 8,
-              background: `${C.orange}15`, border: `1px solid ${C.orange}44`,
-              fontSize: 12, color: C.orange,
-            }}>
+            <div className={styles.conflict}>
               ⚠ These objectives may require opposing content strategies. Consider whether both are truly needed.
             </div>
           )}
-        </Section>
+        </div>
 
-        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 8 }}>
+        <div className={styles.modalFooter}>
           <Btn variant="secondary" onClick={onClose}>Cancel</Btn>
           <Btn onClick={handleCreate} disabled={!canCreate}>Create Campaign</Btn>
         </div>
       </div>
     </div>
-  )
-}
-
-function Section({ label, children }) {
-  return (
-    <div style={{ marginBottom: 22 }}>
-      <div style={{ fontSize: 12, fontWeight: 600, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>
-        {label}
-      </div>
-      {children}
-    </div>
-  )
-}
-
-function ToggleTag({ label, selected, onToggle, activeColor, activeBg }) {
-  return (
-    <span
-      onClick={onToggle}
-      style={{
-        display: 'inline-flex', alignItems: 'center',
-        padding: '5px 12px', borderRadius: 20,
-        fontSize: 12, fontWeight: 500,
-        cursor: 'pointer',
-        color: selected ? (activeColor ?? C.green) : C.textMuted,
-        background: selected ? (activeBg ?? `${C.green}15`) : C.surfaceHigh,
-        border: `1px solid ${selected ? (activeColor ?? C.green) + '44' : C.border}`,
-        transition: 'all 0.15s',
-      }}
-    >
-      {selected && <span style={{ marginRight: 4 }}>✓</span>}
-      {label}
-    </span>
   )
 }
