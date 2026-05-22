@@ -2,8 +2,8 @@ import { useState } from 'react'
 import styles from './Sidebar.module.css'
 
 const NAV = [
-  { id: 'campaigns',    label: 'Campaigns',    icon: '◈' },
   { id: 'opportunities',label: 'Opportunities',icon: '◎' },
+  { id: 'campaigns',    label: 'Campaigns',    icon: '◈' },
   { id: 'brands',       label: 'Brands',       icon: '◉' },
   { id: 'connections',  label: 'Connections',  icon: '⬡' },
 ]
