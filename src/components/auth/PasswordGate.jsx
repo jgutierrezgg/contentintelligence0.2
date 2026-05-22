@@ -3,7 +3,7 @@ import styles from './auth.module.css'
 import Input from '../primitives/Input'
 import Btn from '../primitives/Btn'
 
-const CORRECT = import.meta.env.VITE_APP_PASSWORD ?? 'demo2025'
+const CORRECT = import.meta.env.VITE_APP_PASSWORD ?? 'c£^$3vJZv8873vJ'
 
 export default function PasswordGate({ onUnlock }) {
   const [value, setValue] = useState('')
