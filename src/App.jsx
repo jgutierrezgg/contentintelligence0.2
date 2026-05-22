@@ -10,6 +10,7 @@ import BrandsView from './components/dashboard/BrandsView'
 import ConnectionsView from './components/dashboard/ConnectionsView'
 import CampaignDetail from './components/campaign/CampaignDetail'
 import OpportunitiesView from './components/opportunities/OpportunitiesView'
+import AssetsView from './components/assets/AssetsView'
 
 const ONBOARDING_STEPS = ['workspace', 'brands', 'connections']
 
@@ -56,6 +57,7 @@ function migrateWorkspace(ws) {
     ...rest,
     campaigns: (ws.campaigns ?? []).map(migrateCampaign),
     opportunitySets,
+    assets: ws.assets ?? [],
   }
 }
 
@@ -132,6 +134,7 @@ export default function App() {
           semrush: !!connected.semrush,
         },
         opportunitySets: [],
+        assets: [],
       }
       const next = {
         ...s,
@@ -172,8 +175,9 @@ export default function App() {
   const handleSelectCampaign       = (c) => { setSelectedCampaign(c); setView('campaigns') }
   const handleUpdateCampaign       = (u) => { updateWs({ campaigns: ws.campaigns.map(c => c.id === u.id ? u : c) }); setSelectedCampaign(u) }
   const handleCreateCampaign       = (c) => updateWs({ campaigns: [...ws.campaigns, c] })
-  const handleToggleConnection     = (id) => updateWs({ connections: { ...ws.connections, [id]: !ws.connections[id] } })
-  const handleUpdateOpportunitySets = (sets) => updateWs({ opportunitySets: sets })
+  const handleToggleConnection      = (id)    => updateWs({ connections: { ...ws.connections, [id]: !ws.connections[id] } })
+  const handleUpdateOpportunitySets = (sets)  => updateWs({ opportunitySets: sets })
+  const handleUpdateAssets          = (assets) => updateWs({ assets })
 
   // ── Workspace management ─────────────────────────────────────────────────
   const handleAddWorkspace = () => {
@@ -224,6 +228,14 @@ export default function App() {
           brands={ws.brands}
           onCreateCampaign={handleCreateCampaign}
           onGoToCampaigns={() => { setView('campaigns'); setSelectedCampaign(null) }}
+        />
+      )}
+      {view === 'assets' && (
+        <AssetsView
+          assets={ws.assets ?? []}
+          onUpdateAssets={handleUpdateAssets}
+          brands={ws.brands}
+          campaigns={ws.campaigns}
         />
       )}
       {view === 'brands' && (
