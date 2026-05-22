@@ -473,15 +473,13 @@
   border: 1px solid var(--color-border);
   cursor: pointer;
   transition:
-    background     var(--transition-fast),
-    border-color   var(--transition-fast),
-    box-shadow     var(--transition-fast);
+    background   var(--transition-fast),
+    border-color var(--transition-fast);
 }
 
 .oppRow:hover {
   background: var(--color-surface);
   border-color: var(--color-border-light);
-  box-shadow: 0 2px 8px rgba(15, 17, 40, 0.06);
 }
 
 .oppRow:hover .oppTitle {
@@ -567,13 +565,11 @@
 .oppRowSelected {
   border-color: var(--color-accent);
   background: rgba(var(--rgb-accent), 0.05);
-  box-shadow: 0 0 0 3px rgba(var(--rgb-accent), 0.08);
 }
 
 .oppRowSelected:hover {
-  background: rgba(var(--rgb-accent), 0.08);
+  background: rgba(var(--rgb-accent), 0.09);
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(var(--rgb-accent), 0.10);
 }
 
 .oppRowSelected .dismissBtn {
@@ -596,7 +592,6 @@
   display: flex;
   flex-direction: column;
   z-index: 200;
-  box-shadow: -4px 0 24px rgba(15, 17, 40, 0.08);
   animation: panelSlideIn 0.2s ease;
 }
 
