@@ -26,30 +26,41 @@ const MOCK_OPPORTUNITIES = [
   {
     id: 'o1', title: 'Ultimate Guide to Content Strategy', workflow: 'Create', volume: 8400, score: 94,
     detail: {
+      rationale: 'HubSpot, Moz, and Neil Patel all rank in the top 5 for "content strategy" with a combined estimated 13,100 monthly visits. You have no page targeting this cluster — at a difficulty of 34 this is achievable and the traffic potential justifies a full pillar piece.',
       intent: 'Informational',
       difficulty: 34,
       trafficPotential: 12400,
       keywords: ['content strategy', 'content marketing guide', 'content planning'],
       contentType: 'Long-form article (3,000+ words)',
-      competitor: 'hubspot.com/marketing/content-strategy',
+      competitors: [
+        { name: 'HubSpot',    url: 'hubspot.com/marketing/content-strategy',   position: 1, traffic: 8200, da: 93 },
+        { name: 'Neil Patel', url: 'neilpatel.com/blog/content-strategy',       position: 3, traffic: 3100, da: 88 },
+        { name: 'Moz',        url: 'moz.com/blog/content-strategy-guide',       position: 5, traffic: 1800, da: 91 },
+      ],
       notes: '',
     },
   },
   {
     id: 'o2', title: 'How to Improve Organic Rankings', workflow: 'Optimize', volume: 5200, score: 88,
     detail: {
+      rationale: 'Your page sits at position 14.2 with 18,600 monthly impressions but only a 6.7% CTR — just off page one. Pages ranked 1–3 earn 3–10× more clicks. Expanding the backlink section and refreshing outdated stats are the primary levers to break into the top 10.',
       url: '/blog/seo-tips',
       position: 14.2,
       traffic: 1240,
       impressions: 18600,
       ctr: 6.7,
       actions: ['Add structured data markup', 'Expand backlink building section', 'Refresh stats and update publish date'],
+      competitors: [
+        { name: 'Backlinko',   url: 'backlinko.com/how-to-rank-on-google', position: 1, traffic: 12400 },
+        { name: 'Ahrefs Blog', url: 'ahrefs.com/blog/google-ranking',      position: 4, traffic: 5200  },
+      ],
       notes: '',
     },
   },
   {
     id: 'o3', title: 'Product Comparison Page', workflow: 'Convert', volume: 3100, score: 76,
     detail: {
+      rationale: '3,100 monthly visitors with commercial intent land on this page, yet only 0.8% convert — well below the 2–3% SaaS industry average. The traffic is already qualified; CRO improvements here have the highest direct revenue impact of any page on the site.',
       url: '/compare',
       traffic: 3100,
       conversionRate: 0.8,
@@ -61,6 +72,7 @@ const MOCK_OPPORTUNITIES = [
   {
     id: 'o4', title: '2021 Marketing Trends (Outdated)', workflow: 'Delete', volume: 210, score: 12,
     detail: {
+      rationale: 'Traffic has dropped 62% in 90 days as users increasingly search for current-year content. The page competes internally with your newer trends articles and earns no meaningful backlinks. A 301 redirect preserves residual link equity and eliminates the crawl-budget drain.',
       url: '/blog/2021-marketing-trends',
       traffic: 210,
       trend: -62,
@@ -72,24 +84,34 @@ const MOCK_OPPORTUNITIES = [
   {
     id: 'o5', title: 'Email Marketing Best Practices', workflow: 'Create', volume: 6700, score: 91,
     detail: {
+      rationale: 'Mailchimp and Campaign Monitor dominate this keyword cluster with pages driving an estimated 11,100 combined visits/month. Your site has no dedicated pillar page here despite email being a core service — this is a direct traffic gap versus category leaders.',
       intent: 'Informational / Commercial',
       difficulty: 41,
       trafficPotential: 9800,
       keywords: ['email marketing best practices', 'email marketing tips', 'email campaign strategy'],
       contentType: 'Comprehensive guide with examples',
-      competitor: 'mailchimp.com/resources/email-marketing-best-practices',
+      competitors: [
+        { name: 'Mailchimp',        url: 'mailchimp.com/resources/email-marketing-best-practices',   position: 2, traffic: 5800, da: 90 },
+        { name: 'Campaign Monitor', url: 'campaignmonitor.com/resources/guides/email-marketing',     position: 3, traffic: 3200, da: 82 },
+        { name: 'HubSpot',          url: 'blog.hubspot.com/marketing/email-marketing-guide',         position: 5, traffic: 2100, da: 93 },
+      ],
       notes: '',
     },
   },
   {
     id: 'o6', title: 'Landing Page Optimization Tips', workflow: 'Optimize', volume: 4400, score: 83,
     detail: {
+      rationale: 'Ranking at 11.8 with 14,200 impressions signals strong indexing but suboptimal content relevance. Unbounce and Crazy Egg dominate positions 1–3 with current-year updates and A/B testing case studies — exactly the content gaps your page is missing.',
       url: '/blog/landing-page-tips',
       position: 11.8,
       traffic: 890,
       impressions: 14200,
       ctr: 6.3,
       actions: ['Update title to include current year', 'Add A/B testing case studies', 'Expand CTA section with examples'],
+      competitors: [
+        { name: 'Unbounce',  url: 'unbounce.com/landing-page-optimization', position: 1, traffic: 7800 },
+        { name: 'Crazy Egg', url: 'crazyegg.com/blog/landing-page-tips',    position: 3, traffic: 3400 },
+      ],
       notes: '',
     },
   },
@@ -580,6 +602,14 @@ function OppDetailPanel({ opp, onClose, onUpdate }) {
           )}
         </div>
 
+        {/* Rationale — always shown when present */}
+        {d.rationale && (
+          <div className={styles.rationaleBox}>
+            <div className={styles.rationaleLabel}>Why this opportunity</div>
+            <p className={styles.rationaleText}>{d.rationale}</p>
+          </div>
+        )}
+
         {/* Create-specific */}
         {opp.workflow === 'Create' && (
           <>
@@ -592,9 +622,9 @@ function OppDetailPanel({ opp, onClose, onUpdate }) {
               </PanelField>
             )}
             {d.contentType && <PanelField label="Suggested Content Type"><span>{d.contentType}</span></PanelField>}
-            {d.competitor && (
-              <PanelField label="Competing Page">
-                <span className={styles.urlText}>{d.competitor}</span>
+            {d.competitors?.length > 0 && (
+              <PanelField label="Competitor Analysis">
+                <CompetitorTable competitors={d.competitors} showDa />
               </PanelField>
             )}
           </>
@@ -609,6 +639,11 @@ function OppDetailPanel({ opp, onClose, onUpdate }) {
                 <ul className={styles.actionList}>
                   {d.actions.map((a, i) => <li key={i} className={styles.actionItem}>{a}</li>)}
                 </ul>
+              </PanelField>
+            )}
+            {d.competitors?.length > 0 && (
+              <PanelField label="Competing Pages">
+                <CompetitorTable competitors={d.competitors} />
               </PanelField>
             )}
           </>
@@ -649,6 +684,31 @@ function OppDetailPanel({ opp, onClose, onUpdate }) {
         </PanelField>
 
       </div>
+    </div>
+  )
+}
+
+function CompetitorTable({ competitors, showDa }) {
+  const cols = showDa ? '1fr 40px 72px 36px' : '1fr 40px 72px'
+  return (
+    <div className={styles.competitorTable}>
+      <div className={styles.competitorHead} style={{ gridTemplateColumns: cols }}>
+        <span>Competitor</span>
+        <span>Pos.</span>
+        <span>Est. Traffic</span>
+        {showDa && <span>DA</span>}
+      </div>
+      {competitors.map((c, i) => (
+        <div key={i} className={styles.competitorRow} style={{ gridTemplateColumns: cols }}>
+          <div className={styles.competitorName}>
+            <span className={styles.competitorNameText}>{c.name}</span>
+            <span className={styles.competitorUrl}>{c.url}</span>
+          </div>
+          <span className={styles.competitorCell}>{c.position}</span>
+          <span className={styles.competitorCell}>{c.traffic?.toLocaleString()}</span>
+          {showDa && <span className={styles.competitorCell}>{c.da}</span>}
+        </div>
+      ))}
     </div>
   )
 }

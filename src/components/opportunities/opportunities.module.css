@@ -641,6 +641,104 @@
   margin-top: 2px;
 }
 
+/* ── Rationale box ── */
+.rationaleBox {
+  background: rgba(var(--rgb-accent), 0.05);
+  border: 1px solid rgba(var(--rgb-accent), 0.15);
+  border-left: 3px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.rationaleLabel {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-accent-soft);
+}
+
+.rationaleText {
+  font-size: var(--font-base);
+  color: var(--color-text);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Competitor table ── */
+.competitorTable {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  font-size: var(--font-sm);
+}
+
+.competitorHead {
+  display: grid;
+  grid-template-columns: 1fr 40px 72px 36px;
+  gap: var(--space-2);
+  padding: 6px var(--space-3);
+  background: var(--color-surface-high);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.competitorRow {
+  display: grid;
+  grid-template-columns: 1fr 40px 72px 36px;
+  gap: var(--space-2);
+  align-items: center;
+  padding: 8px var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  transition: background var(--transition-fast);
+}
+
+.competitorRow:last-child {
+  border-bottom: none;
+}
+
+.competitorRow:hover {
+  background: var(--color-surface-high);
+}
+
+.competitorName {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.competitorNameText {
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.competitorUrl {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.competitorCell {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 /* ── Panel fields ── */
 .panelField {
   display: flex;
