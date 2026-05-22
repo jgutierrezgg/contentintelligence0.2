@@ -30,13 +30,13 @@ export default function PasswordGate({ onUnlock }) {
         <Input
           value={value}
           onChange={v => { setValue(v); setError(false) }}
-          placeholder="Contraseña"
+          placeholder="Password"
           type="password"
         />
 
-        {error && <p className={styles.errorText}>Contraseña incorrecta.</p>}
+        {error && <p className={styles.errorText}>Incorrect password.</p>}
 
-        <Btn onClick={attempt}>Entrar →</Btn>
+        <Btn onClick={attempt}>Enter →</Btn>
       </div>
     </div>
   )
