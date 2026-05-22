@@ -11,9 +11,12 @@ const PLAN_STEPS = [
 
 const STATUSES = ['Pending', 'In Progress', 'Done']
 
+// Brief → linkedIds: string[]   (one brief can be linked to many content pieces)
+// Content → linkedId: string|null  (one content is linked to at most one brief)
 const INITIAL_ITEMS = [
   {
-    id: 'b1', type: 'brief', week: 1, status: 'Done', linkedId: 'c1',
+    id: 'b1', type: 'brief', week: 1, status: 'Done',
+    linkedIds: ['c1', 'c5'],
     title: 'Ultimate Guide to Content Strategy',
     objective: 'Rank for high-volume content strategy keywords and establish thought leadership.',
     keywords: ['content strategy', 'content marketing guide', 'content planning'],
@@ -26,12 +29,20 @@ const INITIAL_ITEMS = [
     notes: 'Target 3,000+ words. Include an infographic and a downloadable template.',
   },
   {
-    id: 'c1', type: 'content', week: 1, status: 'In Progress', linkedId: 'b1',
+    id: 'c1', type: 'content', week: 1, status: 'In Progress',
+    linkedId: 'b1',
     title: 'Ultimate Guide to Content Strategy',
     body: '',
   },
   {
-    id: 'b2', type: 'brief', week: 1, status: 'In Progress', linkedId: null,
+    id: 'c5', type: 'content', week: 1, status: 'Pending',
+    linkedId: 'b1',
+    title: 'Content Strategy — Case Studies',
+    body: '',
+  },
+  {
+    id: 'b2', type: 'brief', week: 1, status: 'In Progress',
+    linkedIds: [],
     title: 'Email Marketing Best Practices',
     objective: 'Capture email marketing keywords and drive newsletter signups.',
     keywords: ['email marketing', 'email best practices', 'email campaigns'],
@@ -44,12 +55,14 @@ const INITIAL_ITEMS = [
     notes: 'Focus on B2B email marketing angle. Cross-link to landing page article.',
   },
   {
-    id: 'c2', type: 'content', week: 2, status: 'Pending', linkedId: null,
+    id: 'c2', type: 'content', week: 2, status: 'Pending',
+    linkedId: null,
     title: 'How to Improve Organic Rankings',
     body: '',
   },
   {
-    id: 'b3', type: 'brief', week: 2, status: 'Pending', linkedId: 'c3',
+    id: 'b3', type: 'brief', week: 2, status: 'Pending',
+    linkedIds: ['c3'],
     title: 'Landing Page Optimization Tips',
     objective: 'Target CRO and landing page keywords to attract bottom-of-funnel traffic.',
     keywords: ['landing page optimization', 'conversion rate optimization', 'CRO tips'],
@@ -62,23 +75,31 @@ const INITIAL_ITEMS = [
     notes: '',
   },
   {
-    id: 'c3', type: 'content', week: 2, status: 'Pending', linkedId: 'b3',
+    id: 'c3', type: 'content', week: 2, status: 'Pending',
+    linkedId: 'b3',
     title: 'Landing Page Optimization Tips',
     body: '',
   },
   {
-    id: 'c4', type: 'content', week: 3, status: 'Pending', linkedId: null,
+    id: 'c4', type: 'content', week: 3, status: 'Pending',
+    linkedId: null,
     title: 'Product Comparison Page',
     body: '',
   },
 ]
 
+function hasLinks(item) {
+  return item.type === 'brief'
+    ? item.linkedIds?.length > 0
+    : item.linkedId !== null
+}
+
 export default function CampaignContentPlan({ onApprove }) {
-  const [planDone, setPlanDone]   = useState(false)
-  const [approved, setApproved]   = useState(false)
-  const [items, setItems]         = useState(INITIAL_ITEMS)
+  const [planDone, setPlanDone]     = useState(false)
+  const [approved, setApproved]     = useState(false)
+  const [items, setItems]           = useState(INITIAL_ITEMS)
   const [selectedId, setSelectedId] = useState(null)
-  const [dragOver, setDragOver]   = useState(null)
+  const [dragOver, setDragOver]     = useState(null)
   const dragging = useRef(null)
 
   const selected = items.find(i => i.id === selectedId) ?? null
@@ -91,34 +112,37 @@ export default function CampaignContentPlan({ onApprove }) {
     dragging.current = id
     e.dataTransfer.effectAllowed = 'move'
   }
-
   const onDragOver = (e, id) => {
     e.preventDefault()
     e.dataTransfer.dropEffect = 'move'
     setDragOver(id)
   }
-
   const onDrop = (e, targetId) => {
     e.preventDefault()
     const fromId = dragging.current
     dragging.current = null
     setDragOver(null)
     if (!fromId || fromId === targetId) return
-
     setItems(prev => {
       const arr = [...prev]
       const fromIdx = arr.findIndex(i => i.id === fromId)
       const toIdx   = arr.findIndex(i => i.id === targetId)
-      const targetWeek = arr[toIdx].week
       const [moved] = arr.splice(fromIdx, 1)
-      moved.week = targetWeek
+      moved.week    = arr[Math.min(toIdx, arr.length - 1)]?.week ?? moved.week
       const insertAt = arr.findIndex(i => i.id === targetId)
-      arr.splice(insertAt, 0, moved)
+      arr.splice(insertAt < 0 ? arr.length : insertAt, 0, moved)
       return arr
     })
   }
 
   if (approved) return <div className={styles.approved}>✓ Content plan approved — execution underway.</div>
+
+  // Resolve linked items for the selected panel
+  const linkedItems = selected
+    ? selected.type === 'brief'
+      ? (selected.linkedIds ?? []).map(id => items.find(i => i.id === id)).filter(Boolean)
+      : items.filter(i => i.id === selected.linkedId)
+    : []
 
   return (
     <>
@@ -138,41 +162,46 @@ export default function CampaignContentPlan({ onApprove }) {
                 <div key={week}>
                   <div className={styles.weekLabel}>Week {week}</div>
                   <div className={styles.planItems}>
-                    {items.filter(i => i.week === week).map(item => {
-                      const linked = items.find(i => i.id === item.linkedId)
-                      return (
-                        <div
-                          key={item.id}
-                          draggable
-                          onDragStart={e => onDragStart(e, item.id)}
-                          onDragOver={e => onDragOver(e, item.id)}
-                          onDragLeave={() => setDragOver(null)}
-                          onDrop={e => onDrop(e, item.id)}
-                          onDragEnd={() => { setDragOver(null); dragging.current = null }}
-                          onClick={() => setSelectedId(item.id === selectedId ? null : item.id)}
-                          className={[
-                            styles.planRow,
-                            item.id === selectedId ? styles.planRowSelected : '',
-                            item.id === dragOver   ? styles.planRowDragOver : '',
-                          ].filter(Boolean).join(' ')}
-                        >
-                          <span className={styles.dragHandle}>⠿</span>
-                          <span className={item.type === 'brief' ? styles.typeBrief : styles.typeContent}>
-                            {item.type === 'brief' ? 'Brief' : 'Content'}
-                          </span>
-                          <span className={styles.planRowTitle}>{item.title}</span>
-                          <div className={styles.planRowMeta}>
-                            {linked && (
-                              <span
-                                className={styles.linkIndicator}
-                                title={`Linked to ${linked.type}: ${linked.title}`}
-                              >⇄</span>
-                            )}
-                            <StatusPill status={item.status} />
-                          </div>
+                    {items.filter(i => i.week === week).map(item => (
+                      <div
+                        key={item.id}
+                        draggable
+                        onDragStart={e => onDragStart(e, item.id)}
+                        onDragOver={e => onDragOver(e, item.id)}
+                        onDragLeave={() => setDragOver(null)}
+                        onDrop={e => onDrop(e, item.id)}
+                        onDragEnd={() => { setDragOver(null); dragging.current = null }}
+                        onClick={() => setSelectedId(item.id === selectedId ? null : item.id)}
+                        className={[
+                          styles.planRow,
+                          item.id === selectedId ? styles.planRowSelected  : '',
+                          item.id === dragOver   ? styles.planRowDragOver  : '',
+                        ].filter(Boolean).join(' ')}
+                      >
+                        <span className={styles.dragHandle}>⠿</span>
+                        <span className={item.type === 'brief' ? styles.typeBrief : styles.typeContent}>
+                          {item.type === 'brief' ? 'Brief' : 'Content'}
+                        </span>
+                        <span className={styles.planRowTitle}>{item.title}</span>
+                        <div className={styles.planRowMeta}>
+                          {hasLinks(item) && (
+                            <span
+                              className={styles.linkIndicator}
+                              title={
+                                item.type === 'brief'
+                                  ? `${item.linkedIds.length} linked content piece${item.linkedIds.length !== 1 ? 's' : ''}`
+                                  : 'Linked to brief'
+                              }
+                            >
+                              {item.type === 'brief' && item.linkedIds.length > 1
+                                ? `⇄ ${item.linkedIds.length}`
+                                : '⇄'}
+                            </span>
+                          )}
+                          <StatusPill status={item.status} />
                         </div>
-                      )
-                    })}
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}
@@ -189,10 +218,10 @@ export default function CampaignContentPlan({ onApprove }) {
       {selected && (
         <DetailPanel
           item={selected}
-          linked={items.find(i => i.id === selected.linkedId)}
+          linkedItems={linkedItems}
           onClose={() => setSelectedId(null)}
           onUpdate={patch => updateItem(selected.id, patch)}
-          onGoToLinked={() => setSelectedId(selected.linkedId)}
+          onGoTo={id => setSelectedId(id)}
         />
       )}
     </>
@@ -208,7 +237,7 @@ function StatusPill({ status }) {
   return <span className={[styles.statusPill, cls].join(' ')}>{status}</span>
 }
 
-function DetailPanel({ item, linked, onClose, onUpdate, onGoToLinked }) {
+function DetailPanel({ item, linkedItems, onClose, onUpdate, onGoTo }) {
   return (
     <div className={styles.detailPanel}>
       <div className={styles.detailPanelHead}>
@@ -220,7 +249,6 @@ function DetailPanel({ item, linked, onClose, onUpdate, onGoToLinked }) {
       </div>
 
       <div className={styles.detailPanelBody}>
-
         <Field label="Title">
           <input
             className={styles.fieldInput}
@@ -243,13 +271,28 @@ function DetailPanel({ item, linked, onClose, onUpdate, onGoToLinked }) {
           </div>
         </Field>
 
-        {linked && (
-          <Field label={`Linked ${linked.type === 'brief' ? 'Brief' : 'Content'}`}>
-            <button className={styles.linkedChip} onClick={onGoToLinked}>
-              <span className={linked.type === 'brief' ? styles.typeBrief : styles.typeContent}>
-                {linked.type === 'brief' ? 'Brief' : 'Content'}
-              </span>
-              <span className={styles.linkedChipTitle}>{linked.title}</span>
+        {/* Brief → list of linked content pieces */}
+        {item.type === 'brief' && linkedItems.length > 0 && (
+          <Field label={`Linked Content (${linkedItems.length})`}>
+            <div className={styles.linkedList}>
+              {linkedItems.map(c => (
+                <button key={c.id} className={styles.linkedChip} onClick={() => onGoTo(c.id)}>
+                  <span className={styles.typeContent}>Content</span>
+                  <span className={styles.linkedChipTitle}>{c.title}</span>
+                  <StatusPill status={c.status} />
+                  <span className={styles.linkedChipArrow}>→</span>
+                </button>
+              ))}
+            </div>
+          </Field>
+        )}
+
+        {/* Content → single linked brief */}
+        {item.type === 'content' && linkedItems.length > 0 && (
+          <Field label="Linked Brief">
+            <button className={styles.linkedChip} onClick={() => onGoTo(linkedItems[0].id)}>
+              <span className={styles.typeBrief}>Brief</span>
+              <span className={styles.linkedChipTitle}>{linkedItems[0].title}</span>
               <span className={styles.linkedChipArrow}>→</span>
             </button>
           </Field>
@@ -308,7 +351,6 @@ function DetailPanel({ item, linked, onClose, onUpdate, onGoToLinked }) {
             />
           </Field>
         )}
-
       </div>
     </div>
   )

@@ -520,6 +520,12 @@
 }
 
 /* Linked item chip */
+.linkedList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .linkedChip {
   display: flex;
   align-items: center;
