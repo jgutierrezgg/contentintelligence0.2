@@ -18,15 +18,13 @@ export const CONFLICTING_PAIRS = [
 ]
 
 export const PIPELINE_STEPS = [
-  { id: "setup", label: "Campaign Setup" },
-  { id: "research", label: "Research" },
-  { id: "opportunities", label: "Opportunities" },
-  { id: "content", label: "Content Plan" },
-  { id: "tracking", label: "Tracking" },
+  { id: "research",  label: "Research"  },
+  { id: "analysis",  label: "Analysis"  },
+  { id: "planning",  label: "Planning"  },
+  { id: "execution", label: "Execution" },
 ]
 
 export const CAMPAIGN_STATUSES = {
-  setup: "Setup",
   active: "Active",
   completed: "Completed",
 }

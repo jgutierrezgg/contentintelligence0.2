@@ -4,16 +4,15 @@ import { PIPELINE_STEPS } from '../../constants/campaign'
 import Btn from '../primitives/Btn'
 import Tag from '../primitives/Tag'
 import CampaignResearch from './CampaignResearch'
-import CampaignOpportunities from './CampaignOpportunities'
-import CampaignContentPlan from './CampaignContentPlan'
-import CampaignTracking from './CampaignTracking'
-import { ApprovalGate } from './CampaignResearch'
+import CampaignAnalysis from './CampaignAnalysis'
+import CampaignPlanning from './CampaignPlanning'
+import CampaignExecution from './CampaignExecution'
 
 export default function CampaignDetail({ campaign, onBack, onUpdate }) {
-  const [activeStep, setActiveStep] = useState(campaign.currentStep ?? 'setup')
+  const [activeStep, setActiveStep] = useState(campaign.currentStep ?? 'research')
 
   const processedSteps = campaign.processedSteps ?? {}
-  const currentStepIdx = PIPELINE_STEPS.findIndex(s => s.id === (campaign.currentStep ?? 'setup'))
+  const currentStepIdx = PIPELINE_STEPS.findIndex(s => s.id === (campaign.currentStep ?? 'research'))
 
   const advance = (nextStep) => {
     onUpdate({ ...campaign, currentStep: nextStep, status: 'Active' })
@@ -24,7 +23,6 @@ export default function CampaignDetail({ campaign, onBack, onUpdate }) {
     onUpdate({ ...campaign, processedSteps: { ...processedSteps, [stepId]: true } })
   }
 
-  // Wipe the step and everything after it, then navigate back to it
   const handleRerun = (stepId) => {
     const fromIdx  = PIPELINE_STEPS.findIndex(s => s.id === stepId)
     const resetIds = new Set(PIPELINE_STEPS.slice(fromIdx).map(s => s.id))
@@ -35,8 +33,7 @@ export default function CampaignDetail({ campaign, onBack, onUpdate }) {
     setActiveStep(stepId)
   }
 
-  // True only when the viewed tab equals the furthest step reached
-  const isAtFrontier = activeStep === (campaign.currentStep ?? 'setup')
+  const isAtFrontier = activeStep === (campaign.currentStep ?? 'research')
 
   return (
     <div>
@@ -73,68 +70,35 @@ export default function CampaignDetail({ campaign, onBack, onUpdate }) {
       </div>
 
       <div className={styles.phaseContent}>
-        {activeStep === 'setup' && (
-          <SetupPhase campaign={campaign} onStart={() => advance('research')} />
-        )}
         {activeStep === 'research' && (
           <CampaignResearch
-            onApprove={() => advance('opportunities')}
+            onApprove={() => advance('analysis')}
             isProcessed={!!processedSteps.research}
             onProcessed={() => handleProcessed('research')}
             canAdvance={isAtFrontier}
             onRerun={() => handleRerun('research')}
           />
         )}
-        {activeStep === 'opportunities' && (
-          <CampaignOpportunities
-            onApprove={() => advance('content')}
-            isProcessed={!!processedSteps.opportunities}
-            onProcessed={() => handleProcessed('opportunities')}
+        {activeStep === 'analysis' && (
+          <CampaignAnalysis
+            onApprove={() => advance('planning')}
+            isProcessed={!!processedSteps.analysis}
+            onProcessed={() => handleProcessed('analysis')}
             canAdvance={isAtFrontier}
-            onRerun={() => handleRerun('opportunities')}
+            onRerun={() => handleRerun('analysis')}
           />
         )}
-        {activeStep === 'content' && (
-          <CampaignContentPlan
-            onApprove={() => advance('tracking')}
-            isProcessed={!!processedSteps.content}
-            onProcessed={() => handleProcessed('content')}
+        {activeStep === 'planning' && (
+          <CampaignPlanning
+            onApprove={() => advance('execution')}
+            isProcessed={!!processedSteps.planning}
+            onProcessed={() => handleProcessed('planning')}
             canAdvance={isAtFrontier}
-            onRerun={() => handleRerun('content')}
+            onRerun={() => handleRerun('planning')}
           />
         )}
-        {activeStep === 'tracking' && <CampaignTracking />}
+        {activeStep === 'execution' && <CampaignExecution />}
       </div>
-    </div>
-  )
-}
-
-function SetupPhase({ campaign, onStart }) {
-  return (
-    <div className={styles.phaseStack}>
-      <div>
-        <div className={styles.phaseHeaderRow}>
-          <span>🔵</span>
-          <h2 className={styles.phaseTitle}>Campaign Setup</h2>
-        </div>
-        <p className={styles.phaseSubtitle}>Review and confirm your campaign configuration before starting research.</p>
-      </div>
-      <div className={styles.phaseReviewCard}>
-        <ReviewRow label="Name"       value={<span>{campaign.name}</span>} />
-        <ReviewRow label="Brands"     value={<div className={styles.reviewTags}>{campaign.brands?.map(b    => <Tag key={b} variant="accent">{b}</Tag>)}</div>} />
-        <ReviewRow label="Markets"    value={<div className={styles.reviewTags}>{campaign.markets?.map(m   => <Tag key={m}>{m}</Tag>)}</div>} />
-        <ReviewRow label="Objectives" value={<div className={styles.reviewTags}>{campaign.objectives?.map(o => <Tag key={o} variant="blue">{o}</Tag>)}</div>} />
-      </div>
-      <ApprovalGate label="Confirm configuration and start Research phase" onApprove={onStart} />
-    </div>
-  )
-}
-
-function ReviewRow({ label, value }) {
-  return (
-    <div className={styles.reviewRow}>
-      <span className={styles.reviewLabel}>{label}</span>
-      <span className={styles.reviewValue}>{value}</span>
     </div>
   )
 }

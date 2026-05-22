@@ -9,6 +9,7 @@ import Dashboard from './components/dashboard/Dashboard'
 import BrandsView from './components/dashboard/BrandsView'
 import ConnectionsView from './components/dashboard/ConnectionsView'
 import CampaignDetail from './components/campaign/CampaignDetail'
+import OpportunitiesView from './components/opportunities/OpportunitiesView'
 
 const ONBOARDING_STEPS = ['workspace', 'brands', 'connections']
 
@@ -26,6 +27,25 @@ const INITIAL_STATE = {
   onboarding: BLANK_ONBOARDING,
 }
 
+const STEP_MIGRATE = { setup: 'research', opportunities: 'analysis', content: 'planning', tracking: 'execution' }
+
+function migrateCampaign(c) {
+  const newStep = STEP_MIGRATE[c.currentStep] ?? c.currentStep ?? 'research'
+  const newProcessed = {}
+  for (const [k, v] of Object.entries(c.processedSteps ?? {})) {
+    newProcessed[STEP_MIGRATE[k] ?? k] = v
+  }
+  return { ...c, currentStep: newStep, processedSteps: newProcessed, objectives: c.objectives ?? [] }
+}
+
+function migrateWorkspace(ws) {
+  return {
+    ...ws,
+    campaigns: (ws.campaigns ?? []).map(migrateCampaign),
+    opportunities: ws.opportunities ?? { objectives: [], isProcessed: false, items: [] },
+  }
+}
+
 function loadState() {
   try {
     const raw = localStorage.getItem('ci_state')
@@ -34,17 +54,18 @@ function loadState() {
     // Migrate old format (had workspace/brands/campaigns/connections at root)
     if (s && !s.workspaces) {
       if (s.onboardingDone && s.workspace) {
-        const ws = {
+        const ws = migrateWorkspace({
           id: Date.now(),
           name: s.workspace,
           brands: s.brands ?? [],
           campaigns: s.campaigns ?? [],
           connections: s.connections ?? { ga: false, gsc: false, semrush: false },
-        }
+        })
         return { workspaces: [ws], activeWsId: ws.id, onboarding: { ...BLANK_ONBOARDING, active: false } }
       }
       return null
     }
+    if (s?.workspaces) s.workspaces = s.workspaces.map(migrateWorkspace)
     return s
   } catch { return null }
 }
@@ -97,6 +118,7 @@ export default function App() {
           gsc: !!connected.gsc,
           semrush: !!connected.semrush,
         },
+        opportunities: { objectives: [], isProcessed: false, items: [] },
       }
       const next = {
         ...s,
@@ -134,10 +156,11 @@ export default function App() {
       return next
     })
 
-  const handleSelectCampaign   = (c) => { setSelectedCampaign(c); setView('campaigns') }
-  const handleUpdateCampaign   = (u) => { updateWs({ campaigns: ws.campaigns.map(c => c.id === u.id ? u : c) }); setSelectedCampaign(u) }
-  const handleCreateCampaign   = (c) => updateWs({ campaigns: [...ws.campaigns, c] })
-  const handleToggleConnection = (id) => updateWs({ connections: { ...ws.connections, [id]: !ws.connections[id] } })
+  const handleSelectCampaign       = (c) => { setSelectedCampaign(c); setView('campaigns') }
+  const handleUpdateCampaign       = (u) => { updateWs({ campaigns: ws.campaigns.map(c => c.id === u.id ? u : c) }); setSelectedCampaign(u) }
+  const handleCreateCampaign       = (c) => updateWs({ campaigns: [...ws.campaigns, c] })
+  const handleToggleConnection     = (id) => updateWs({ connections: { ...ws.connections, [id]: !ws.connections[id] } })
+  const handleUpdateOpportunities  = (patch) => updateWs({ opportunities: { ...(ws.opportunities ?? {}), ...patch } })
 
   // ── Workspace management ─────────────────────────────────────────────────
   const handleAddWorkspace = () => {
@@ -179,6 +202,15 @@ export default function App() {
           campaign={selectedCampaign}
           onBack={() => setSelectedCampaign(null)}
           onUpdate={handleUpdateCampaign}
+        />
+      )}
+      {view === 'opportunities' && (
+        <OpportunitiesView
+          opportunities={ws.opportunities}
+          onUpdate={handleUpdateOpportunities}
+          brands={ws.brands}
+          onCreateCampaign={handleCreateCampaign}
+          onGoToCampaigns={() => { setView('campaigns'); setSelectedCampaign(null) }}
         />
       )}
       {view === 'brands' && (

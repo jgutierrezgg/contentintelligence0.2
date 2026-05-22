@@ -1,31 +1,18 @@
 import { useState } from 'react'
 import styles from './dashboard.module.css'
-import { MARKETS, OBJECTIVES, CONFLICTING_PAIRS } from '../../constants/campaign'
+import { MARKETS } from '../../constants/campaign'
 import Input from '../primitives/Input'
 import Btn from '../primitives/Btn'
 
-function hasConflict(selected) {
-  return CONFLICTING_PAIRS.some(([a, b]) => selected.includes(a) && selected.includes(b))
-}
-
 export default function NewCampaignModal({ brands, onCreate, onClose }) {
-  const [name, setName] = useState('')
+  const [name, setName]                     = useState('')
   const [selectedBrands, setSelectedBrands] = useState([])
   const [selectedMarkets, setSelectedMarkets] = useState([])
-  const [selectedObjectives, setSelectedObjectives] = useState([])
 
-  const toggleBrand = (b) => setSelectedBrands(s => s.includes(b) ? s.filter(x => x !== b) : [...s, b])
+  const toggleBrand  = (b) => setSelectedBrands(s  => s.includes(b)  ? s.filter(x => x !== b)  : [...s, b])
   const toggleMarket = (m) => setSelectedMarkets(s => s.includes(m) ? s.filter(x => x !== m) : [...s, m])
-  const toggleObjective = (id) => {
-    if (selectedObjectives.includes(id)) {
-      setSelectedObjectives(s => s.filter(x => x !== id))
-    } else if (selectedObjectives.length < 2) {
-      setSelectedObjectives(s => [...s, id])
-    }
-  }
 
-  const conflict = hasConflict(selectedObjectives)
-  const canCreate = name.trim() && selectedBrands.length && selectedMarkets.length && selectedObjectives.length
+  const canCreate = name.trim() && selectedBrands.length && selectedMarkets.length
 
   const handleCreate = () => {
     if (!canCreate) return
@@ -34,9 +21,9 @@ export default function NewCampaignModal({ brands, onCreate, onClose }) {
       name: name.trim(),
       brands: selectedBrands,
       markets: selectedMarkets,
-      objectives: OBJECTIVES.filter(o => selectedObjectives.includes(o.id)).map(o => o.label),
-      status: 'Setup',
-      currentStep: 'setup',
+      objectives: [],
+      status: 'Active',
+      currentStep: 'research',
       processedSteps: {},
     })
   }
@@ -84,35 +71,6 @@ export default function NewCampaignModal({ brands, onCreate, onClose }) {
               </span>
             ))}
           </div>
-        </div>
-
-        <div className={styles.section}>
-          <div className={styles.sectionLabel}>Objectives (max 2)</div>
-          <div className={styles.objectiveList}>
-            {OBJECTIVES.map(obj => {
-              const sel = selectedObjectives.includes(obj.id)
-              const disabled = !sel && selectedObjectives.length >= 2
-              return (
-                <div
-                  key={obj.id}
-                  onClick={() => !disabled && toggleObjective(obj.id)}
-                  className={[
-                    styles.objective,
-                    sel      ? styles.selected : '',
-                    disabled ? styles.disabled : '',
-                  ].filter(Boolean).join(' ')}
-                >
-                  <span>{sel ? '◉' : '○'}</span>
-                  {obj.label}
-                </div>
-              )
-            })}
-          </div>
-          {conflict && (
-            <div className={styles.conflict}>
-              ⚠ These objectives may require opposing content strategies. Consider whether both are truly needed.
-            </div>
-          )}
         </div>
 
         <div className={styles.modalFooter}>

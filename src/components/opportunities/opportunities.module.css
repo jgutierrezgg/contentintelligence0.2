@@ -1,0 +1,196 @@
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 720px;
+}
+
+.viewHeader {
+  margin-bottom: var(--space-2);
+}
+
+.viewTitle {
+  font-size: var(--font-2xl);
+  font-weight: 700;
+  margin-bottom: var(--space-1);
+}
+
+.viewSubtitle {
+  color: var(--color-text-muted);
+  font-size: var(--font-base);
+}
+
+/* ── Setup card ── */
+.setupCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.setupLabel {
+  font-size: var(--font-base);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.objectiveTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.objectiveTag {
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-high);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.objectiveTag:hover {
+  border-color: var(--color-border-light);
+  color: var(--color-text);
+}
+
+.objectiveTagSelected {
+  background: rgba(var(--rgb-accent), 0.12);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.checkMark {
+  font-size: 10px;
+}
+
+/* ── Process box ── */
+.processBox {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+}
+
+/* ── Results bar ── */
+.resultsBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.resultsCount {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+.resultsActions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* ── Add form ── */
+.addForm {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.addInput {
+  flex: 1;
+  background: var(--color-surface-high);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-size: var(--font-base);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.addInput:focus { border-color: var(--color-accent); }
+
+.addSelect {
+  background: var(--color-surface-high);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-size: var(--font-sm);
+  outline: none;
+  cursor: pointer;
+}
+
+/* ── Opportunity list (reuse campaign visual pattern) ── */
+.oppList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.oppRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-high);
+  border: 1px solid var(--color-border);
+}
+
+.oppTitle {
+  flex: 1;
+  font-size: var(--font-base);
+}
+
+.oppVol {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  width: 90px;
+  text-align: right;
+}
+
+.scoreRing {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.scoreInner {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: var(--color-surface-high);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+/* ── CTA row ── */
+.ctaRow {
+  padding-top: var(--space-2);
+}
