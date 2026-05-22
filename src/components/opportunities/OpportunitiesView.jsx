@@ -33,6 +33,7 @@ const MOCK_OPPORTUNITIES = [
 
 export default function OpportunitiesView({ opportunitySets, onUpdateSets, brands, onCreateCampaign, onGoToCampaigns }) {
   const [selectedSetId, setSelectedSetId] = useState(null)
+  const [autoRunId, setAutoRunId]         = useState(null)
   const [showCreateForm, setShowCreateForm] = useState(false)
 
   const selectedSet = opportunitySets.find(s => s.id === selectedSetId) ?? null
@@ -53,6 +54,7 @@ export default function OpportunitiesView({ opportunitySets, onUpdateSets, brand
     }
     onUpdateSets([...opportunitySets, newSet])
     setShowCreateForm(false)
+    setAutoRunId(newSet.id)
     setSelectedSetId(newSet.id)
   }
 
@@ -65,7 +67,8 @@ export default function OpportunitiesView({ opportunitySets, onUpdateSets, brand
     return (
       <SetDetail
         set={selectedSet}
-        onBack={() => setSelectedSetId(null)}
+        autoRun={autoRunId === selectedSet.id}
+        onBack={() => { setSelectedSetId(null); setAutoRunId(null) }}
         onUpdate={patch => updateSet(selectedSet.id, patch)}
         onDelete={() => deleteSet(selectedSet.id)}
         brands={brands}
@@ -272,8 +275,8 @@ function SetCard({ set, onClick }) {
   )
 }
 
-function SetDetail({ set, onBack, onUpdate, onDelete, brands, onCreateCampaign, onGoToCampaigns }) {
-  const [running, setRunning]           = useState(false)
+function SetDetail({ set, autoRun, onBack, onUpdate, onDelete, brands, onCreateCampaign, onGoToCampaigns }) {
+  const [running, setRunning]           = useState(autoRun ?? false)
   const [showAddForm, setShowAddForm]   = useState(false)
   const [newTitle, setNewTitle]         = useState('')
   const [newWorkflow, setNewWorkflow]   = useState('Create')
