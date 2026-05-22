@@ -69,6 +69,7 @@ export default function App() {
         try { sessionStorage.setItem('ci_session', 'ok') } catch {}
         setAuthed(true)
       }} />
+
     )
   }
 

@@ -4,9 +4,9 @@ import Btn from '../primitives/Btn'
 import Input from '../primitives/Input'
 import { generateSalt, hashPassword, verifyPassword } from '../../utils/crypto'
 
-const AUTH_KEY    = 'ci_auth'
-const MAX_ATTEMPTS  = 5
-const LOCKOUT_MS  = 30_000
+const AUTH_KEY   = 'ci_auth'
+const MAX_ATTEMPTS = 5
+const LOCKOUT_MS   = 30_000
 
 function loadAuth() {
   try { return JSON.parse(localStorage.getItem(AUTH_KEY)) } catch { return null }
@@ -16,14 +16,13 @@ function saveAuth(data) {
 }
 
 export default function Login({ onAuthenticated }) {
-  const auth = loadAuth()
-  const [mode, setMode]           = useState(auth ? 'login' : 'register')
-  const [username, setUsername]   = useState('')
-  const [password, setPassword]   = useState('')
-  const [confirm,  setConfirm]    = useState('')
-  const [error,    setError]      = useState('')
-  const [loading,  setLoading]    = useState(false)
-  const [attempts, setAttempts]   = useState(0)
+  const hasPassword = !!loadAuth()
+  const [mode, setMode]         = useState(hasPassword ? 'login' : 'register')
+  const [password, setPassword] = useState('')
+  const [confirm,  setConfirm]  = useState('')
+  const [error,    setError]    = useState('')
+  const [loading,  setLoading]  = useState(false)
+  const [attempts, setAttempts] = useState(0)
   const [lockUntil, setLockUntil] = useState(null)
   const [countdown, setCountdown] = useState(0)
   const timerRef = useRef(null)
@@ -48,32 +47,17 @@ export default function Login({ onAuthenticated }) {
     return () => clearInterval(timerRef.current)
   }, [lockUntil])
 
-  const registerFailed = (msg) => setError(msg)
-
-  const loginFailed = () => {
-    const next = attempts + 1
-    setAttempts(next)
-    if (next >= MAX_ATTEMPTS) {
-      setLockUntil(Date.now() + LOCKOUT_MS)
-      setError(`Too many attempts. Please wait ${LOCKOUT_MS / 1000} seconds.`)
-    } else {
-      setError(`Invalid credentials. ${MAX_ATTEMPTS - next} attempt${MAX_ATTEMPTS - next !== 1 ? 's' : ''} remaining.`)
-    }
-  }
-
   const handleRegister = async () => {
     setError('')
-    if (!username.trim())        return registerFailed('Username is required.')
-    if (username.trim().length < 3) return registerFailed('Username must be at least 3 characters.')
-    if (password.length < 8)     return registerFailed('Password must be at least 8 characters.')
-    if (password !== confirm)    return registerFailed('Passwords do not match.')
+    if (password.length < 8) return setError('Password must be at least 8 characters.')
+    if (password !== confirm) return setError('Passwords do not match.')
 
     setLoading(true)
     try {
       const salt = generateSalt()
       const hash = await hashPassword(password, salt)
-      saveAuth({ username: username.trim().toLowerCase(), hash, salt })
-      onAuthenticated(username.trim())
+      saveAuth({ hash, salt })
+      onAuthenticated()
     } catch {
       setError('An unexpected error occurred. Please try again.')
     } finally {
@@ -85,18 +69,23 @@ export default function Login({ onAuthenticated }) {
     if (locked) return
     setError('')
     const stored = loadAuth()
-    if (!stored) return setError('No account found.')
+    if (!stored) return setError('No password set.')
 
     setLoading(true)
     try {
-      const usernameMatch = stored.username === username.trim().toLowerCase()
-      const passwordMatch = await verifyPassword(password, stored.hash, stored.salt)
-      // Check both before branching to avoid timing-based username enumeration
-      if (usernameMatch && passwordMatch) {
+      const valid = await verifyPassword(password, stored.hash, stored.salt)
+      if (valid) {
         setAttempts(0)
-        onAuthenticated(stored.username)
+        onAuthenticated()
       } else {
-        loginFailed()
+        const next = attempts + 1
+        setAttempts(next)
+        if (next >= MAX_ATTEMPTS) {
+          setLockUntil(Date.now() + LOCKOUT_MS)
+          setError(`Too many attempts. Wait ${LOCKOUT_MS / 1000} seconds.`)
+        } else {
+          setError(`Incorrect password. ${MAX_ATTEMPTS - next} attempt${MAX_ATTEMPTS - next !== 1 ? 's' : ''} remaining.`)
+        }
       }
     } catch {
       setError('An unexpected error occurred. Please try again.')
@@ -106,9 +95,8 @@ export default function Login({ onAuthenticated }) {
   }
 
   const handleKey = (e) => {
-    if (e.key === 'Enter' && !loading && !locked) {
+    if (e.key === 'Enter' && !loading && !locked)
       mode === 'login' ? handleLogin() : handleRegister()
-    }
   }
 
   return (
@@ -120,49 +108,35 @@ export default function Login({ onAuthenticated }) {
         </div>
 
         <h2 className={styles.heading}>
-          {mode === 'login' ? 'Sign in' : 'Create your account'}
+          {mode === 'login' ? 'Enter password' : 'Set a password'}
         </h2>
         <p className={styles.subheading}>
           {mode === 'login'
-            ? 'Enter your credentials to access your workspaces.'
-            : 'Set up your credentials to get started.'}
+            ? 'Enter your password to access your workspaces.'
+            : 'Choose a password to protect your workspaces.'}
         </p>
 
         {error && (
           <div className={styles.errorBanner}>
             <span className={styles.errorIcon}>⚠</span>
-            {locked ? `Account locked. Try again in ${countdown}s.` : error}
+            {locked ? `Locked. Try again in ${countdown}s.` : error}
           </div>
         )}
 
         <div className={styles.fields}>
-          <label className={styles.label}>
-            Username
+          <Input
+            value={password}
+            onChange={setPassword}
+            placeholder={mode === 'register' ? 'At least 8 characters' : '••••••••'}
+            type="password"
+          />
+          {mode === 'register' && (
             <Input
-              value={username}
-              onChange={setUsername}
-              placeholder="your-username"
-            />
-          </label>
-          <label className={styles.label}>
-            Password
-            <Input
-              value={password}
-              onChange={setPassword}
-              placeholder={mode === 'register' ? 'At least 8 characters' : '••••••••'}
+              value={confirm}
+              onChange={setConfirm}
+              placeholder="Confirm password"
               type="password"
             />
-          </label>
-          {mode === 'register' && (
-            <label className={styles.label}>
-              Confirm password
-              <Input
-                value={confirm}
-                onChange={setConfirm}
-                placeholder="Repeat password"
-                type="password"
-              />
-            </label>
           )}
         </div>
 
@@ -170,19 +144,11 @@ export default function Login({ onAuthenticated }) {
           onClick={mode === 'login' ? handleLogin : handleRegister}
           disabled={loading || locked}
         >
-          {loading
-            ? 'Verifying…'
-            : locked
-            ? `Locked (${countdown}s)`
-            : mode === 'login'
-            ? 'Sign in →'
-            : 'Create account →'}
+          {loading ? 'Verifying…' : locked ? `Locked (${countdown}s)` : mode === 'login' ? 'Enter →' : 'Set password →'}
         </Btn>
 
-        {mode === 'login' && auth && (
-          <p className={styles.hint}>
-            Forgot your password? Clear browser data to reset the account.
-          </p>
+        {mode === 'login' && (
+          <p className={styles.hint}>Forgot your password? Clear browser data to reset.</p>
         )}
       </div>
     </div>
