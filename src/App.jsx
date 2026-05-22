@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import styles from './App.module.css'
-import Login from './components/auth/Login'
+import PasswordGate from './components/auth/PasswordGate'
 import AppShell from './components/layout/AppShell'
 import StepWorkspace from './components/onboarding/StepWorkspace'
 import StepBrands from './components/onboarding/StepBrands'
@@ -54,7 +54,7 @@ function saveState(state) {
 }
 
 function loadSession() {
-  try { return sessionStorage.getItem('ci_session') === 'ok' } catch { return false }
+  try { return sessionStorage.getItem('ci_unlocked') === '1' } catch { return false }
 }
 
 export default function App() {
@@ -64,13 +64,7 @@ export default function App() {
   const [selectedCampaign, setSelectedCampaign] = useState(null)
 
   if (!authed) {
-    return (
-      <Login onAuthenticated={() => {
-        try { sessionStorage.setItem('ci_session', 'ok') } catch {}
-        setAuthed(true)
-      }} />
-
-    )
+    return <PasswordGate onUnlock={() => setAuthed(true)} />
   }
 
   const update = (patch) => {
@@ -158,7 +152,7 @@ export default function App() {
   }
 
   const handleLogout = () => {
-    try { sessionStorage.removeItem('ci_session') } catch {}
+    try { sessionStorage.removeItem('ci_unlocked') } catch {}
     setAuthed(false)
   }
 
