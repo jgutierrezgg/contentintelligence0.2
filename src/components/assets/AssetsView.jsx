@@ -6,6 +6,7 @@ import Tag from '../primitives/Tag'
 const ASSET_TYPES = [
   'Blog Post', 'Landing Page', 'Guide', 'Email',
   'eBook', 'Case Study', 'Infographic', 'Social Post', 'Video', 'Webinar',
+  'Brief', 'Content',
 ]
 
 const TYPE_VARIANT = {
@@ -19,6 +20,8 @@ const TYPE_VARIANT = {
   'Social Post':  'orange',
   'Video':        'red',
   'Webinar':      'blue',
+  'Brief':        'blue',
+  'Content':      'accent',
 }
 
 const TABS = [
@@ -27,13 +30,33 @@ const TABS = [
   { id: 'draft',     label: 'Drafts'  },
 ]
 
-export default function AssetsView({ assets, onUpdateAssets, brands, campaigns }) {
-  const [tab, setTab]             = useState('all')
-  const [search, setSearch]       = useState('')
-  const [typeFilter, setTypeFilter] = useState('')
-  const [showForm, setShowForm]   = useState(false)
+function deriveCampaignAssets(campaigns) {
+  return (campaigns ?? []).flatMap(c =>
+    (c.planItems ?? []).map(item => ({
+      _source: 'campaign',
+      id: `${c.id}__${item.id}`,
+      title: item.title,
+      type: item.type === 'brief' ? 'Brief' : 'Content',
+      status: item.status === 'Done' ? 'published' : 'draft',
+      url: null,
+      brandName: null,
+      campaignId: c.id,
+      campaignName: c.name,
+      updatedAt: 0,
+    }))
+  )
+}
 
-  const filtered = assets.filter(a => {
+export default function AssetsView({ assets, onUpdateAssets, brands, campaigns }) {
+  const [tab, setTab]               = useState('all')
+  const [search, setSearch]         = useState('')
+  const [typeFilter, setTypeFilter] = useState('')
+  const [showForm, setShowForm]     = useState(false)
+
+  const campaignAssets = deriveCampaignAssets(campaigns)
+  const allAssets      = [...assets, ...campaignAssets]
+
+  const filtered = allAssets.filter(a => {
     if (tab === 'published' && a.status !== 'published') return false
     if (tab === 'draft'     && a.status !== 'draft')     return false
     if (typeFilter && a.type !== typeFilter)              return false
@@ -42,9 +65,9 @@ export default function AssetsView({ assets, onUpdateAssets, brands, campaigns }
   })
 
   const counts = {
-    all:       assets.length,
-    published: assets.filter(a => a.status === 'published').length,
-    draft:     assets.filter(a => a.status === 'draft').length,
+    all:       allAssets.length,
+    published: allAssets.filter(a => a.status === 'published').length,
+    draft:     allAssets.filter(a => a.status === 'draft').length,
   }
 
   const addAsset = (asset) => {
@@ -111,11 +134,11 @@ export default function AssetsView({ assets, onUpdateAssets, brands, campaigns }
         <div className={styles.empty}>
           <div className={styles.emptyIcon}>◫</div>
           <div className={styles.emptyText}>
-            {assets.length === 0
-              ? 'No assets yet. Add your first asset to start tracking content.'
+            {allAssets.length === 0
+              ? 'No assets yet. Assets created in campaign planning will appear here automatically.'
               : 'No assets match your filters.'}
           </div>
-          {assets.length === 0 && (
+          {allAssets.length === 0 && (
             <Btn onClick={() => setShowForm(true)}>Add your first asset</Btn>
           )}
         </div>
@@ -126,7 +149,7 @@ export default function AssetsView({ assets, onUpdateAssets, brands, campaigns }
               key={asset.id}
               asset={asset}
               campaigns={campaigns}
-              onRemove={() => removeAsset(asset.id)}
+              onRemove={asset._source === 'campaign' ? null : () => removeAsset(asset.id)}
             />
           ))}
         </div>
@@ -139,10 +162,12 @@ export default function AssetsView({ assets, onUpdateAssets, brands, campaigns }
 /*  Asset row                                                   */
 /* ─────────────────────────────────────────────────────────── */
 function AssetRow({ asset, campaigns, onRemove }) {
-  const campaign = campaigns?.find(c => c.id === asset.campaignId)
-  const date = new Date(asset.updatedAt).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric',
-  })
+  const linkedCampaign = asset._source !== 'campaign'
+    ? campaigns?.find(c => c.id === asset.campaignId)
+    : null
+  const date = asset.updatedAt
+    ? new Date(asset.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    : null
 
   return (
     <div className={styles.assetRow}>
@@ -160,20 +185,29 @@ function AssetRow({ asset, campaigns, onRemove }) {
 
       <div className={styles.assetMeta}>
         {asset.brandName && <Tag>{asset.brandName}</Tag>}
-        {campaign && <Tag variant="accent">{campaign.name}</Tag>}
+        {asset.campaignName && (
+          <Tag variant="accent">{asset.campaignName}</Tag>
+        )}
+        {linkedCampaign && !asset.campaignName && (
+          <Tag variant="accent">{linkedCampaign.name}</Tag>
+        )}
       </div>
 
-      <span className={styles.assetDate}>{date}</span>
+      {date && <span className={styles.assetDate}>{date}</span>}
 
       <Tag variant={asset.status === 'published' ? 'green' : 'orange'}>
         {asset.status === 'published' ? 'On Site' : 'Draft'}
       </Tag>
 
-      <button
-        className={styles.removeBtn}
-        onClick={e => { e.stopPropagation(); onRemove() }}
-        title="Remove"
-      >✕</button>
+      {onRemove ? (
+        <button
+          className={styles.removeBtn}
+          onClick={e => { e.stopPropagation(); onRemove() }}
+          title="Remove"
+        >✕</button>
+      ) : (
+        <span className={styles.removeBtn} style={{ opacity: 0, pointerEvents: 'none' }}>✕</span>
+      )}
     </div>
   )
 }

@@ -92,20 +92,28 @@ function hasLinks(item) {
     : item.linkedId !== null
 }
 
-export default function CampaignPlanning({ onApprove, isProcessed, onProcessed, canAdvance, onRerun }) {
+export default function CampaignPlanning({ onApprove, isProcessed, onProcessed, canAdvance, onRerun, planItems, onUpdateItems }) {
   const [planDone, setPlanDone]     = useState(isProcessed)
   const [approved, setApproved]     = useState(false)
-  const [items, setItems]           = useState(INITIAL_ITEMS)
+  const [items, setItems]           = useState(() => planItems?.length > 0 ? planItems : INITIAL_ITEMS)
   const [selectedId, setSelectedId] = useState(null)
   const [view, setView]             = useState('list')
   const [dragOver, setDragOver]     = useState(null)
   const dragging = useRef(null)
 
+  const persistItems = (updater) => {
+    setItems(prev => {
+      const next = typeof updater === 'function' ? updater(prev) : updater
+      onUpdateItems?.(next)
+      return next
+    })
+  }
+
   const selected = items.find(i => i.id === selectedId) ?? null
   const weeks    = [...new Set(items.map(i => i.week))].sort((a, b) => a - b)
 
   const updateItem = (id, patch) =>
-    setItems(prev => prev.map(i => i.id === id ? { ...i, ...patch } : i))
+    persistItems(prev => prev.map(i => i.id === id ? { ...i, ...patch } : i))
 
   const onDragStart = (e, id) => {
     dragging.current = id
@@ -122,7 +130,7 @@ export default function CampaignPlanning({ onApprove, isProcessed, onProcessed, 
     dragging.current = null
     setDragOver(null)
     if (!fromId || fromId === targetId) return
-    setItems(prev => {
+    persistItems(prev => {
       const arr = [...prev]
       const fromIdx = arr.findIndex(i => i.id === fromId)
       const toIdx   = arr.findIndex(i => i.id === targetId)

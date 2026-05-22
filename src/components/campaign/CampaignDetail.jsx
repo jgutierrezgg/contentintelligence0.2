@@ -95,6 +95,8 @@ export default function CampaignDetail({ campaign, onBack, onUpdate }) {
             onProcessed={() => handleProcessed('planning')}
             canAdvance={isAtFrontier}
             onRerun={() => handleRerun('planning')}
+            planItems={campaign.planItems ?? null}
+            onUpdateItems={(items) => onUpdate({ ...campaign, planItems: items })}
           />
         )}
         {activeStep === 'execution' && <CampaignExecution />}
