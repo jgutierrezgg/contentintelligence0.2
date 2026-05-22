@@ -4,6 +4,7 @@ const VARIANT = {
   Setup:     'setup',
   Active:    'active',
   Completed: 'completed',
+  Cancelled: 'cancelled',
 }
 
 export default function StatusPill({ status }) {

@@ -4,10 +4,12 @@ import Btn from '../primitives/Btn'
 import CampaignCard from './CampaignCard'
 import NewCampaignModal from './NewCampaignModal'
 
-export default function Dashboard({ campaigns, brands, onSelectCampaign, onCreateCampaign }) {
+export default function Dashboard({ campaigns, brands, onSelectCampaign, onCreateCampaign, onDeleteCampaign, onCancelCampaign }) {
   const [showModal, setShowModal] = useState(false)
 
   const handleCreate = (campaign) => { onCreateCampaign(campaign); setShowModal(false) }
+
+  const active = campaigns.filter(c => c.status !== 'Cancelled').length
 
   return (
     <div>
@@ -15,7 +17,8 @@ export default function Dashboard({ campaigns, brands, onSelectCampaign, onCreat
         <div>
           <h1 className={styles.pageTitle}>Campaigns</h1>
           <p className={styles.pageSubtitle}>
-            {campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''} running
+            {active} active campaign{active !== 1 ? 's' : ''}
+            {campaigns.length > active ? ` · ${campaigns.length - active} cancelled` : ''}
           </p>
         </div>
         <Btn onClick={() => setShowModal(true)}>+ New Campaign</Btn>
@@ -30,7 +33,13 @@ export default function Dashboard({ campaigns, brands, onSelectCampaign, onCreat
       ) : (
         <div className={styles.grid}>
           {campaigns.map(c => (
-            <CampaignCard key={c.id} campaign={c} onClick={() => onSelectCampaign(c)} />
+            <CampaignCard
+              key={c.id}
+              campaign={c}
+              onClick={() => onSelectCampaign(c)}
+              onDelete={onDeleteCampaign}
+              onCancel={onCancelCampaign}
+            />
           ))}
         </div>
       )}

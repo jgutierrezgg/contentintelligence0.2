@@ -25,6 +25,7 @@ export const PIPELINE_STEPS = [
 ]
 
 export const CAMPAIGN_STATUSES = {
-  active: "Active",
+  active:    "Active",
   completed: "Completed",
+  cancelled: "Cancelled",
 }

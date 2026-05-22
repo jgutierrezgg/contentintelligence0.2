@@ -179,6 +179,17 @@ export default function App() {
   const handleUpdateOpportunitySets = (sets)  => updateWs({ opportunitySets: sets })
   const handleUpdateAssets          = (assets) => updateWs({ assets })
 
+  const handleDeleteCampaign = (id) => {
+    updateWs({ campaigns: ws.campaigns.filter(c => c.id !== id) })
+    if (selectedCampaign?.id === id) setSelectedCampaign(null)
+  }
+
+  const handleCancelCampaign = (id, overrideStatus) => {
+    const status = overrideStatus ?? 'Cancelled'
+    updateWs({ campaigns: ws.campaigns.map(c => c.id === id ? { ...c, status } : c) })
+    if (selectedCampaign?.id === id) setSelectedCampaign(prev => ({ ...prev, status }))
+  }
+
   // ── Workspace management ─────────────────────────────────────────────────
   const handleAddWorkspace = () => {
     update({ onboarding: BLANK_ONBOARDING })
@@ -212,6 +223,8 @@ export default function App() {
           brands={ws.brands}
           onSelectCampaign={handleSelectCampaign}
           onCreateCampaign={handleCreateCampaign}
+          onDeleteCampaign={handleDeleteCampaign}
+          onCancelCampaign={handleCancelCampaign}
         />
       )}
       {view === 'campaigns' && selectedCampaign && (
@@ -219,6 +232,7 @@ export default function App() {
           campaign={selectedCampaign}
           onBack={() => setSelectedCampaign(null)}
           onUpdate={handleUpdateCampaign}
+          onDelete={() => handleDeleteCampaign(selectedCampaign.id)}
         />
       )}
       {view === 'opportunities' && (

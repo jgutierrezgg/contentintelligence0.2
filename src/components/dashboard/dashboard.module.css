@@ -87,9 +87,108 @@
   letter-spacing: 0.05em;
 }
 
-.pill.setup     { color: var(--color-orange); background: rgba(var(--rgb-orange), 0.09); }
-.pill.active    { color: var(--color-green);  background: rgba(var(--rgb-green),  0.09); }
-.pill.completed { color: var(--color-blue);   background: rgba(var(--rgb-blue),   0.09); }
+.pill.setup     { color: var(--color-orange);     background: rgba(var(--rgb-orange), 0.09); }
+.pill.active    { color: var(--color-green);      background: rgba(var(--rgb-green),  0.09); }
+.pill.completed { color: var(--color-blue);       background: rgba(var(--rgb-blue),   0.09); }
+.pill.cancelled { color: var(--color-text-muted); background: rgba(112,112,160, 0.09); }
+
+/* ── Card action menu ── */
+.cardTop {
+  position: relative;
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.menuWrap {
+  position: relative;
+}
+
+.menuBtn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: var(--font-md);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  line-height: 1;
+  opacity: 0;
+  transition: opacity var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
+}
+
+.card:hover .menuBtn {
+  opacity: 1;
+}
+
+.menuBtn:hover {
+  color: var(--color-text);
+  background: var(--color-surface-high);
+}
+
+.menuOpen .menuBtn {
+  opacity: 1;
+  color: var(--color-text);
+  background: var(--color-surface-high);
+}
+
+.menuDropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-1);
+  min-width: 160px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.menuItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  font-family: var(--font-family);
+  font-size: var(--font-sm);
+  color: var(--color-text);
+  padding: 7px var(--space-3);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.menuItem:hover {
+  background: var(--color-surface-high);
+}
+
+.menuItemDanger {
+  color: var(--color-red);
+}
+
+.menuItemDanger:hover {
+  background: rgba(var(--rgb-red), 0.06);
+}
+
+.menuConfirm {
+  padding: var(--space-2) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.menuConfirmText {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+}
 
 /* ── NewCampaignModal overlay ── */
 .overlay {

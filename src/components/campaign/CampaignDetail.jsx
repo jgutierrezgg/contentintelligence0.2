@@ -8,7 +8,7 @@ import CampaignAnalysis from './CampaignAnalysis'
 import CampaignPlanning from './CampaignPlanning'
 import CampaignExecution from './CampaignExecution'
 
-export default function CampaignDetail({ campaign, onBack, onUpdate }) {
+export default function CampaignDetail({ campaign, onBack, onUpdate, onDelete }) {
   const [activeStep, setActiveStep] = useState(campaign.currentStep ?? 'research')
 
   const processedSteps = campaign.processedSteps ?? {}
@@ -39,12 +39,39 @@ export default function CampaignDetail({ campaign, onBack, onUpdate }) {
     <div>
       <div className={styles.detailHeader}>
         <Btn variant="ghost" onClick={onBack} style={{ fontSize: 18, padding: '6px 10px' }}>←</Btn>
-        <div>
+        <div style={{ flex: 1 }}>
           <h1 className={styles.detailTitle}>{campaign.name}</h1>
           <div className={styles.detailTags}>
             {campaign.brands?.map(b => <Tag key={b} variant="accent">{b}</Tag>)}
             {campaign.markets?.map(m => <Tag key={m}>{m}</Tag>)}
           </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexShrink: 0 }}>
+          {campaign.status !== 'Cancelled' ? (
+            <Btn
+              variant="secondary"
+              size="sm"
+              onClick={() => onUpdate({ ...campaign, status: 'Cancelled' })}
+            >
+              Cancel Campaign
+            </Btn>
+          ) : (
+            <Btn
+              variant="secondary"
+              size="sm"
+              onClick={() => onUpdate({ ...campaign, status: 'Active' })}
+            >
+              Reactivate
+            </Btn>
+          )}
+          <Btn
+            variant="ghost"
+            size="sm"
+            onClick={onDelete}
+            style={{ color: 'var(--color-red)' }}
+          >
+            Delete
+          </Btn>
         </div>
       </div>
 
