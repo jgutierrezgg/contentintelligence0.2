@@ -513,3 +513,222 @@
 .ctaRow {
   padding-top: var(--space-2);
 }
+
+/* ── Dismiss button on opp row ── */
+.dismissBtn {
+  background: none;
+  border: none;
+  color: var(--color-text-dim);
+  cursor: pointer;
+  font-size: 10px;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  line-height: 1;
+  transition: color var(--transition-fast), background var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.dismissBtn:hover {
+  color: var(--color-red);
+  background: rgba(var(--rgb-red), 0.08);
+}
+
+/* ── Selected opp row ── */
+.oppRowSelected {
+  border-color: var(--color-accent);
+  background: rgba(var(--rgb-accent), 0.05);
+}
+
+/* ── Opportunity detail panel ── */
+.oppPanel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 400px;
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  z-index: 200;
+  box-shadow: -4px 0 24px rgba(15, 17, 40, 0.08);
+  animation: panelSlideIn 0.2s ease;
+}
+
+@keyframes panelSlideIn {
+  from { transform: translateX(40px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+.oppPanelHead {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.oppPanelTitle {
+  flex: 1;
+  font-size: var(--font-md);
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.4;
+  padding-top: 2px;
+}
+
+.oppPanelClose {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: var(--font-base);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.oppPanelClose:hover {
+  color: var(--color-text);
+  background: var(--color-surface-high);
+}
+
+.oppPanelBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* ── Metrics grid ── */
+.oppMetricRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: var(--space-2);
+}
+
+.oppMetric {
+  background: var(--color-surface-high);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.oppMetricLabel {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.oppMetricValue {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.oppMetricSrc {
+  font-size: 10px;
+  color: var(--color-text-dim);
+  margin-top: 2px;
+}
+
+/* ── Panel fields ── */
+.panelField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.panelFieldLabel {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.panelFieldBody {
+  font-size: var(--font-base);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+/* ── Keywords list ── */
+.kwList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.kwChip {
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(var(--rgb-accent), 0.08);
+  border: 1px solid rgba(var(--rgb-accent), 0.18);
+  color: var(--color-accent-soft);
+  font-size: var(--font-sm);
+}
+
+/* ── URL text ── */
+.urlText {
+  font-family: ui-monospace, 'SF Mono', Consolas, monospace;
+  font-size: var(--font-sm);
+  color: var(--color-blue);
+  word-break: break-all;
+}
+
+/* ── Action list ── */
+.actionList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.actionItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--font-base);
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+.actionItem::before {
+  content: '→';
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Notes textarea ── */
+.oppPanelNotes {
+  width: 100%;
+  min-height: 80px;
+  background: var(--color-surface-high);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-size: var(--font-base);
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--transition-fast);
+  box-sizing: border-box;
+}
+
+.oppPanelNotes:focus {
+  border-color: var(--color-accent);
+}
