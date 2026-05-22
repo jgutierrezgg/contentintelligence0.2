@@ -85,7 +85,7 @@
   color: var(--color-text);
 }
 
-.setCardObjs {
+.setCardMeta {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1);
@@ -98,6 +98,15 @@
   background: rgba(var(--rgb-accent), 0.10);
   color: var(--color-accent-soft);
   border: 1px solid rgba(var(--rgb-accent), 0.18);
+}
+
+.setCardBrand {
+  font-size: var(--font-xs);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(var(--rgb-blue), 0.10);
+  color: var(--color-blue);
+  border: 1px solid rgba(var(--rgb-blue), 0.18);
 }
 
 .setCardRight {
@@ -181,14 +190,134 @@
   gap: var(--space-2);
 }
 
-/* ── Objective tags (shared by create form and detail) ── */
-.objectiveTags {
+/* ── Objective cards ── */
+.objectiveGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-2);
+}
+
+.objectiveCard {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-high);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.objectiveCard:hover {
+  border-color: var(--color-border-light);
+}
+
+.objectiveCardSelected {
+  border-color: var(--color-accent);
+  background: rgba(var(--rgb-accent), 0.08);
+}
+
+.objectiveCardLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-base);
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: 5px;
+}
+
+.objectiveCardDot {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.objectiveCardSelected .objectiveCardDot {
+  color: var(--color-accent);
+}
+
+.objectiveCardDesc {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  padding-left: 21px;
+}
+
+/* ── Custom objectives ── */
+.customRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.customChip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(var(--rgb-accent), 0.10);
+  border: 1px solid rgba(var(--rgb-accent), 0.25);
+  color: var(--color-accent-soft);
+  font-size: var(--font-sm);
+}
+
+.customChipRemove {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 10px;
+  padding: 0;
+  line-height: 1;
+  transition: color var(--transition-fast);
+}
+
+.customChipRemove:hover { color: var(--color-red); }
+
+.customInputRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.customInput {
+  background: var(--color-surface-high);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-size: var(--font-sm);
+  outline: none;
+  width: 200px;
+}
+
+.addCustomBtn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
+  font-family: var(--font-family);
+  cursor: pointer;
+  padding: 0;
+  margin-top: var(--space-3);
+  transition: color var(--transition-fast);
+}
+
+.addCustomBtn:hover { color: var(--color-accent); }
+
+/* ── Brand tags ── */
+.brandTags {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
 }
 
-.objectiveTag {
+.brandTag {
   padding: 6px 14px;
   border-radius: var(--radius-full);
   background: var(--color-surface-high);
@@ -202,12 +331,12 @@
   align-items: center;
 }
 
-.objectiveTag:hover {
+.brandTag:hover {
   border-color: var(--color-border-light);
   color: var(--color-text);
 }
 
-.objectiveTagSelected {
+.brandTagSelected {
   background: rgba(var(--rgb-accent), 0.12);
   border-color: var(--color-accent);
   color: var(--color-accent);
@@ -237,7 +366,7 @@
   gap: var(--space-4);
 }
 
-.detailObjs {
+.detailMeta {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1);

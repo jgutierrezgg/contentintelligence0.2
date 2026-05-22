@@ -40,11 +40,13 @@ export default function OpportunitiesView({ opportunitySets, onUpdateSets, brand
   const updateSet = (id, patch) =>
     onUpdateSets(opportunitySets.map(s => s.id === id ? { ...s, ...patch } : s))
 
-  const createSet = (name, objectives) => {
+  const createSet = ({ name, objectives, customObjectives, brands: setB }) => {
     const newSet = {
       id: `os_${Date.now()}`,
       name,
       objectives,
+      customObjectives: customObjectives ?? [],
+      brands: setB ?? [],
       createdAt: Date.now(),
       lastRunAt: null,
       items: [],
@@ -87,6 +89,7 @@ export default function OpportunitiesView({ opportunitySets, onUpdateSets, brand
 
       {showCreateForm && (
         <CreateForm
+          brands={brands}
           onSubmit={createSet}
           onCancel={() => setShowCreateForm(false)}
         />
@@ -101,11 +104,7 @@ export default function OpportunitiesView({ opportunitySets, onUpdateSets, brand
       ) : (
         <div className={styles.setsList}>
           {opportunitySets.map(set => (
-            <SetCard
-              key={set.id}
-              set={set}
-              onClick={() => setSelectedSetId(set.id)}
-            />
+            <SetCard key={set.id} set={set} onClick={() => setSelectedSetId(set.id)} />
           ))}
         </div>
       )}
@@ -113,14 +112,32 @@ export default function OpportunitiesView({ opportunitySets, onUpdateSets, brand
   )
 }
 
-function CreateForm({ onSubmit, onCancel }) {
-  const [name, setName]           = useState('')
-  const [objectives, setObjectives] = useState([])
+function CreateForm({ brands, onSubmit, onCancel }) {
+  const [name, setName]                   = useState('')
+  const [objectives, setObjectives]       = useState([])
+  const [customObjs, setCustomObjs]       = useState([])
+  const [customInput, setCustomInput]     = useState('')
+  const [showCustomInput, setShowCustomInput] = useState(false)
+  const [selectedBrands, setSelectedBrands] = useState([])
 
   const toggleObj = (id) =>
     setObjectives(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
 
-  const canSubmit = name.trim() && objectives.length > 0
+  const toggleBrand = (b) =>
+    setSelectedBrands(prev => prev.includes(b) ? prev.filter(x => x !== b) : [...prev, b])
+
+  const addCustom = () => {
+    const val = customInput.trim()
+    if (!val || customObjs.includes(val)) return
+    setCustomObjs(prev => [...prev, val])
+    setCustomInput('')
+    setShowCustomInput(false)
+  }
+
+  const removeCustom = (label) =>
+    setCustomObjs(prev => prev.filter(x => x !== label))
+
+  const canSubmit = name.trim() && (objectives.length > 0 || customObjs.length > 0)
 
   return (
     <div className={styles.createForm}>
@@ -130,32 +147,89 @@ function CreateForm({ onSubmit, onCancel }) {
           className={styles.formInput}
           value={name}
           onChange={e => setName(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && canSubmit && onSubmit(name.trim(), objectives)}
           placeholder="e.g. Q3 Organic Growth"
           autoFocus
         />
       </div>
+
       <div className={styles.formGroup}>
         <div className={styles.formLabel}>Objectives</div>
-        <div className={styles.objectiveTags}>
-          {OBJECTIVES.map(obj => (
-            <span
-              key={obj.id}
-              onClick={() => toggleObj(obj.id)}
-              className={[
-                styles.objectiveTag,
-                objectives.includes(obj.id) ? styles.objectiveTagSelected : '',
-              ].filter(Boolean).join(' ')}
-            >
-              {objectives.includes(obj.id) && <span className={styles.checkMark}>✓ </span>}
-              {obj.label}
-            </span>
-          ))}
+        <div className={styles.objectiveGrid}>
+          {OBJECTIVES.map(obj => {
+            const sel = objectives.includes(obj.id)
+            return (
+              <div
+                key={obj.id}
+                onClick={() => toggleObj(obj.id)}
+                className={[styles.objectiveCard, sel ? styles.objectiveCardSelected : ''].filter(Boolean).join(' ')}
+              >
+                <div className={styles.objectiveCardLabel}>
+                  <span className={styles.objectiveCardDot}>{sel ? '◉' : '○'}</span>
+                  {obj.label}
+                </div>
+                <div className={styles.objectiveCardDesc}>{obj.description}</div>
+              </div>
+            )
+          })}
         </div>
+
+        {/* Custom objectives */}
+        {(customObjs.length > 0 || showCustomInput) && (
+          <div className={styles.customRow}>
+            {customObjs.map(label => (
+              <span key={label} className={styles.customChip}>
+                {label}
+                <button className={styles.customChipRemove} onClick={() => removeCustom(label)}>✕</button>
+              </span>
+            ))}
+            {showCustomInput && (
+              <div className={styles.customInputRow}>
+                <input
+                  className={styles.customInput}
+                  value={customInput}
+                  onChange={e => setCustomInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') addCustom(); if (e.key === 'Escape') setShowCustomInput(false) }}
+                  placeholder="Custom objective…"
+                  autoFocus
+                />
+                <Btn size="sm" onClick={addCustom}>Add</Btn>
+                <Btn variant="ghost" size="sm" onClick={() => { setShowCustomInput(false); setCustomInput('') }}>✕</Btn>
+              </div>
+            )}
+          </div>
+        )}
+
+        {!showCustomInput && (
+          <button className={styles.addCustomBtn} onClick={() => setShowCustomInput(true)}>
+            + Add custom objective
+          </button>
+        )}
       </div>
+
+      {brands?.length > 0 && (
+        <div className={styles.formGroup}>
+          <div className={styles.formLabel}>Brands</div>
+          <div className={styles.brandTags}>
+            {brands.map(b => (
+              <span
+                key={b.id}
+                onClick={() => toggleBrand(b.name)}
+                className={[styles.brandTag, selectedBrands.includes(b.name) ? styles.brandTagSelected : ''].filter(Boolean).join(' ')}
+              >
+                {selectedBrands.includes(b.name) && <span className={styles.checkMark}>✓ </span>}
+                {b.name}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className={styles.formActions}>
         <Btn variant="secondary" onClick={onCancel}>Cancel</Btn>
-        <Btn onClick={() => onSubmit(name.trim(), objectives)} disabled={!canSubmit}>
+        <Btn
+          onClick={() => onSubmit({ name: name.trim(), objectives, customObjectives: customObjs, brands: selectedBrands })}
+          disabled={!canSubmit}
+        >
           Create Analysis
         </Btn>
       </div>
@@ -164,16 +238,22 @@ function CreateForm({ onSubmit, onCancel }) {
 }
 
 function SetCard({ set, onClick }) {
-  const objLabels = OBJECTIVES.filter(o => set.objectives.includes(o.id))
-  const lastRun   = set.lastRunAt ? new Date(set.lastRunAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : null
+  const objLabels     = OBJECTIVES.filter(o => set.objectives.includes(o.id))
+  const allObjLabels  = [...objLabels.map(o => o.label), ...(set.customObjectives ?? [])]
+  const lastRun       = set.lastRunAt
+    ? new Date(set.lastRunAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    : null
 
   return (
     <div className={styles.setCard} onClick={onClick}>
       <div className={styles.setCardMain}>
         <div className={styles.setCardName}>{set.name}</div>
-        <div className={styles.setCardObjs}>
-          {objLabels.map(o => (
-            <span key={o.id} className={styles.setCardObj}>{o.label}</span>
+        <div className={styles.setCardMeta}>
+          {allObjLabels.map(l => (
+            <span key={l} className={styles.setCardObj}>{l}</span>
+          ))}
+          {set.brands?.map(b => (
+            <span key={b} className={styles.setCardBrand}>{b}</span>
           ))}
         </div>
       </div>
@@ -193,15 +273,18 @@ function SetCard({ set, onClick }) {
 }
 
 function SetDetail({ set, onBack, onUpdate, onDelete, brands, onCreateCampaign, onGoToCampaigns }) {
-  const [running, setRunning]       = useState(false)
-  const [showAddForm, setShowAddForm] = useState(false)
-  const [newTitle, setNewTitle]     = useState('')
-  const [newWorkflow, setNewWorkflow] = useState('Create')
-  const [showModal, setShowModal]   = useState(false)
+  const [running, setRunning]           = useState(false)
+  const [showAddForm, setShowAddForm]   = useState(false)
+  const [newTitle, setNewTitle]         = useState('')
+  const [newWorkflow, setNewWorkflow]   = useState('Create')
+  const [showModal, setShowModal]       = useState(false)
 
-  const objLabels = OBJECTIVES.filter(o => set.objectives.includes(o.id))
-  const hasItems  = set.items.length > 0
-  const lastRun   = set.lastRunAt ? new Date(set.lastRunAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : null
+  const objLabels     = OBJECTIVES.filter(o => set.objectives.includes(o.id))
+  const allObjLabels  = [...objLabels.map(o => o.label), ...(set.customObjectives ?? [])]
+  const hasItems      = set.items.length > 0
+  const lastRun       = set.lastRunAt
+    ? new Date(set.lastRunAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : null
 
   const handleRun = () => setRunning(true)
 
@@ -240,8 +323,9 @@ function SetDetail({ set, onBack, onUpdate, onDelete, brands, onCreateCampaign, 
       <div className={styles.detailHeader}>
         <div>
           <h1 className={styles.viewTitle}>{set.name}</h1>
-          <div className={styles.detailObjs}>
-            {objLabels.map(o => <Tag key={o.id} variant="accent">{o.label}</Tag>)}
+          <div className={styles.detailMeta}>
+            {allObjLabels.map(l => <Tag key={l} variant="accent">{l}</Tag>)}
+            {set.brands?.map(b => <Tag key={b}>{b}</Tag>)}
           </div>
           {lastRun && !running && (
             <div className={styles.detailLastRun}>Last run {lastRun}</div>
