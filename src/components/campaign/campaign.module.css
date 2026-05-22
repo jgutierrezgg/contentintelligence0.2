@@ -577,6 +577,22 @@
   color: var(--color-text);
 }
 
+/* Re-run bar */
+.rerunBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--color-border);
+  background: transparent;
+}
+
+.rerunNote {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
 .outlineDot {
   width: 5px;
   height: 5px;

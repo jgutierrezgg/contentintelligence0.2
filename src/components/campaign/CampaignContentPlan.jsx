@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import styles from './campaign.module.css'
 import AutoProcess from '../primitives/AutoProcess'
-import { PhaseHeader, ApprovalGate } from './CampaignResearch'
+import { PhaseHeader, ApprovalGate, RerunBar } from './CampaignResearch'
 
 const PLAN_STEPS = [
   'Sorting opportunities by impact score…',
@@ -94,8 +94,8 @@ function hasLinks(item) {
     : item.linkedId !== null
 }
 
-export default function CampaignContentPlan({ onApprove }) {
-  const [planDone, setPlanDone]     = useState(false)
+export default function CampaignContentPlan({ onApprove, isProcessed, onProcessed, canAdvance, onRerun }) {
+  const [planDone, setPlanDone]     = useState(isProcessed)
   const [approved, setApproved]     = useState(false)
   const [items, setItems]           = useState(INITIAL_ITEMS)
   const [selectedId, setSelectedId] = useState(null)
@@ -154,7 +154,7 @@ export default function CampaignContentPlan({ onApprove }) {
         />
 
         {!planDone ? (
-          <AutoProcess steps={PLAN_STEPS} onComplete={() => setPlanDone(true)} />
+          <AutoProcess steps={PLAN_STEPS} onComplete={() => { setPlanDone(true); onProcessed?.() }} />
         ) : (
           <>
             <div className={styles.weekSection}>
@@ -207,10 +207,13 @@ export default function CampaignContentPlan({ onApprove }) {
               ))}
             </div>
 
-            <ApprovalGate
-              label={`Approve ${items.length} items to begin execution`}
-              onApprove={() => { setApproved(true); onApprove?.() }}
-            />
+            {canAdvance
+              ? <ApprovalGate
+                  label={`Approve ${items.length} items to begin execution`}
+                  onApprove={() => { setApproved(true); onApprove?.() }}
+                />
+              : <RerunBar onRerun={onRerun} />
+            }
           </>
         )}
       </div>

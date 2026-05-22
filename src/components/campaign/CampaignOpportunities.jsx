@@ -3,7 +3,7 @@ import styles from './campaign.module.css'
 import AutoProcess from '../primitives/AutoProcess'
 import Btn from '../primitives/Btn'
 import Tag from '../primitives/Tag'
-import { PhaseHeader, ApprovalGate } from './CampaignResearch'
+import { PhaseHeader, ApprovalGate, RerunBar } from './CampaignResearch'
 
 const ANALYSIS_STEPS = [
   'Crossing GA + Search Console data with SEMrush…',
@@ -14,12 +14,11 @@ const ANALYSIS_STEPS = [
 
 const WORKFLOW_VARIANT = { Create: 'green', Optimize: 'blue', Convert: 'orange', Delete: 'red' }
 
-// Used only for the dynamic conic-gradient — no way to express percentage in pure CSS without JS
 const WORKFLOW_COLOR = {
-  Create:  'var(--color-green)',
-  Optimize:'var(--color-blue)',
-  Convert: 'var(--color-orange)',
-  Delete:  'var(--color-red)',
+  Create:   'var(--color-green)',
+  Optimize: 'var(--color-blue)',
+  Convert:  'var(--color-orange)',
+  Delete:   'var(--color-red)',
 }
 
 const MOCK_OPPORTUNITIES = [
@@ -31,21 +30,27 @@ const MOCK_OPPORTUNITIES = [
   { id: 6, title: 'Landing Page Optimization Tips',      workflow: 'Optimize', volume: 4400, score: 83 },
 ]
 
-export default function CampaignOpportunities({ onApprove }) {
-  const [analysisDone, setAnalysisDone] = useState(false)
+export default function CampaignOpportunities({ onApprove, isProcessed, onProcessed, canAdvance, onRerun }) {
+  const [done, setDone]   = useState(isProcessed)
   const [items, setItems] = useState(MOCK_OPPORTUNITIES)
-  const [approved, setApproved] = useState(false)
+
+  const handleComplete = () => {
+    setDone(true)
+    onProcessed()
+  }
 
   const dismiss = (id) => setItems(items.filter(i => i.id !== id))
 
-  if (approved) return <div className={styles.approved}>✓ Opportunities approved — proceeding to Content Plan.</div>
-
   return (
     <div className={styles.phaseStack}>
-      <PhaseHeader icon="🟢" title="Opportunity Analysis" subtitle="AI-generated content opportunities classified by workflow type." />
+      <PhaseHeader
+        icon="🟢"
+        title="Opportunity Analysis"
+        subtitle="AI-generated content opportunities classified by workflow type."
+      />
 
-      {!analysisDone ? (
-        <AutoProcess steps={ANALYSIS_STEPS} onComplete={() => setAnalysisDone(true)} />
+      {!done ? (
+        <AutoProcess steps={ANALYSIS_STEPS} onComplete={handleComplete} />
       ) : (
         <>
           <div className={styles.oppList}>
@@ -56,7 +61,6 @@ export default function CampaignOpportunities({ onApprove }) {
                 </Tag>
                 <div className={styles.oppTitle}>{opp.title}</div>
                 <div className={styles.oppVol}>{opp.volume.toLocaleString()} vol</div>
-                {/* conic-gradient requires dynamic score value — style prop is unavoidable here */}
                 <div
                   className={styles.scoreRing}
                   style={{ background: `conic-gradient(${WORKFLOW_COLOR[opp.workflow]} ${opp.score}%, var(--color-border) 0)` }}
@@ -68,10 +72,10 @@ export default function CampaignOpportunities({ onApprove }) {
             ))}
           </div>
 
-          <ApprovalGate
-            label={`Approve ${items.length} opportunities to generate Content Plan`}
-            onApprove={() => { setApproved(true); onApprove?.() }}
-          />
+          {canAdvance
+            ? <ApprovalGate label={`Approve ${items.length} opportunities to generate Content Plan`} onApprove={onApprove} />
+            : <RerunBar onRerun={onRerun} />
+          }
         </>
       )}
     </div>

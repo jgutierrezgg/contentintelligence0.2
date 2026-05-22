@@ -37,6 +37,7 @@ export default function NewCampaignModal({ brands, onCreate, onClose }) {
       objectives: OBJECTIVES.filter(o => selectedObjectives.includes(o.id)).map(o => o.label),
       status: 'Setup',
       currentStep: 'setup',
+      processedSteps: {},
     })
   }
 

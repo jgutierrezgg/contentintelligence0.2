@@ -22,18 +22,26 @@ const MOCK_PAGES = [
   { type: 'Landing',  path: '/solutions/*', count:  9 },
 ]
 
-export default function CampaignResearch({ onApprove }) {
-  const [researchDone, setResearchDone] = useState(false)
-  const [approved, setApproved] = useState(false)
+export default function CampaignResearch({ onApprove, isProcessed, onProcessed, canAdvance, onRerun }) {
+  // Start as done if already processed — never re-run the animation automatically
+  const [done, setDone] = useState(isProcessed)
 
-  if (approved) return <div className={styles.approved}>✓ Research approved — proceeding to Opportunity Analysis.</div>
+  const handleComplete = () => {
+    setDone(true)
+    onProcessed()
+  }
 
   return (
     <div className={styles.phaseStack}>
-      <PhaseHeader icon="🟢" title="Research" subtitle="Automated data collection across your brand, competitors, and connected sources." />
+      <PhaseHeader
+        icon="🟢"
+        title="Research"
+        subtitle="Automated data collection across your brand, competitors, and connected sources."
+        onRerun={done && !canAdvance ? onRerun : undefined}
+      />
 
-      {!researchDone ? (
-        <AutoProcess steps={RESEARCH_STEPS} onComplete={() => setResearchDone(true)} />
+      {!done ? (
+        <AutoProcess steps={RESEARCH_STEPS} onComplete={handleComplete} />
       ) : (
         <>
           <div className={styles.twoCol}>
@@ -56,10 +64,10 @@ export default function CampaignResearch({ onApprove }) {
             </Card>
           </div>
 
-          <ApprovalGate
-            label="Approve topic map and site architecture to proceed to Opportunity Analysis"
-            onApprove={() => { setApproved(true); onApprove?.() }}
-          />
+          {canAdvance
+            ? <ApprovalGate label="Approve topic map and site architecture to proceed to Opportunity Analysis" onApprove={onApprove} />
+            : <RerunBar onRerun={onRerun} />
+          }
         </>
       )}
     </div>
@@ -83,6 +91,15 @@ export function ApprovalGate({ label, onApprove }) {
     <div className={styles.gate}>
       <span className={styles.gateLabel}>🔵 {label}</span>
       <Btn onClick={onApprove} style={{ flexShrink: 0 }}>Approve →</Btn>
+    </div>
+  )
+}
+
+export function RerunBar({ onRerun }) {
+  return (
+    <div className={styles.rerunBar}>
+      <span className={styles.rerunNote}>This step has already been completed.</span>
+      <Btn variant="ghost" size="sm" onClick={onRerun}>↺ Re-run step</Btn>
     </div>
   )
 }
