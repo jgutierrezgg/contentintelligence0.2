@@ -1,27 +1,27 @@
 :root {
   /* ── Colors ── */
-  --color-bg:           #07080d;
-  --color-surface:      #0e0f17;
-  --color-surface-high: #13141f;
-  --color-border:       #1a1b2e;
-  --color-border-light: #252640;
-  --color-accent:       #7c6af7;
-  --color-accent-glow:  rgba(124, 106, 247, 0.13);
-  --color-accent-soft:  #9d8fff;
-  --color-green:        #10d98a;
-  --color-orange:       #f5a623;
-  --color-red:          #f04f5a;
-  --color-blue:         #4a9eff;
-  --color-text:         #dde1f0;
-  --color-text-muted:   #5a607a;
-  --color-text-dim:     #272a3d;
+  --color-bg:           #f2f3f8;
+  --color-surface:      #ffffff;
+  --color-surface-high: #f7f8fc;
+  --color-border:       #e2e4ef;
+  --color-border-light: #c8cade;
+  --color-accent:       #5c4ee0;
+  --color-accent-glow:  rgba(92, 78, 224, 0.09);
+  --color-accent-soft:  #7060e8;
+  --color-green:        #0c9e68;
+  --color-orange:       #c87810;
+  --color-red:          #d02e3e;
+  --color-blue:         #1e6ed0;
+  --color-text:         #0f1128;
+  --color-text-muted:   #7070a0;
+  --color-text-dim:     #c4c6e0;
 
   /* RGB channels — for composing rgba() with arbitrary alpha */
-  --rgb-accent:  124, 106, 247;
-  --rgb-green:   16, 217, 138;
-  --rgb-orange:  245, 166, 35;
-  --rgb-red:     240, 79, 90;
-  --rgb-blue:    74, 158, 255;
+  --rgb-accent:  92, 78, 224;
+  --rgb-green:   12, 158, 104;
+  --rgb-orange:  200, 120, 16;
+  --rgb-red:     208, 46, 62;
+  --rgb-blue:    30, 110, 208;
 
   /* ── Typography ── */
   --font-family: 'Outfit', sans-serif;

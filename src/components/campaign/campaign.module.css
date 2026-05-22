@@ -352,7 +352,7 @@
   flex-shrink: 0;
 }
 
-.statusPending     { background: rgba(90,96,122,.15);            color: var(--color-text-muted); }
+.statusPending     { background: rgba(112,112,160,.12);           color: var(--color-text-muted); }
 .statusInProgress  { background: rgba(var(--rgb-blue), 0.12);    color: var(--color-blue); }
 .statusDone        { background: rgba(var(--rgb-green), 0.12);   color: var(--color-green); }
 
