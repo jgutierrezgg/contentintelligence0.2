@@ -1,7 +1,7 @@
 import styles from './AppShell.module.css'
 import Sidebar from './Sidebar'
 
-export default function AppShell({ view, onNavigate, workspaces, activeWsId, onSelectWorkspace, onAddWorkspace, children }) {
+export default function AppShell({ view, onNavigate, workspaces, activeWsId, onSelectWorkspace, onAddWorkspace, onLogout, children }) {
   return (
     <div className={styles.shell}>
       <Sidebar
@@ -11,6 +11,7 @@ export default function AppShell({ view, onNavigate, workspaces, activeWsId, onS
         activeWsId={activeWsId}
         onSelectWorkspace={onSelectWorkspace}
         onAddWorkspace={onAddWorkspace}
+        onLogout={onLogout}
       />
       <main className={styles.main}>
         {children}

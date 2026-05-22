@@ -7,7 +7,7 @@ const NAV = [
   { id: 'connections', label: 'Connections', icon: '⬡' },
 ]
 
-export default function Sidebar({ view, onNavigate, workspaces, activeWsId, onSelectWorkspace, onAddWorkspace }) {
+export default function Sidebar({ view, onNavigate, workspaces, activeWsId, onSelectWorkspace, onAddWorkspace, onLogout }) {
   const [wsOpen, setWsOpen] = useState(false)
   const activeWs = workspaces?.find(w => w.id === activeWsId)
 
@@ -60,6 +60,11 @@ export default function Sidebar({ view, onNavigate, workspaces, activeWsId, onSe
           </button>
         ))}
       </nav>
+
+      <button className={styles.logoutBtn} onClick={onLogout}>
+        <span className={styles.navIcon}>⏻</span>
+        Sign out
+      </button>
     </div>
   )
 }

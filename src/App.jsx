@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import styles from './App.module.css'
+import Login from './components/auth/Login'
 import AppShell from './components/layout/AppShell'
 import StepWorkspace from './components/onboarding/StepWorkspace'
 import StepBrands from './components/onboarding/StepBrands'
@@ -52,10 +53,24 @@ function saveState(state) {
   try { localStorage.setItem('ci_state', JSON.stringify(state)) } catch {}
 }
 
+function loadSession() {
+  try { return sessionStorage.getItem('ci_session') === 'ok' } catch { return false }
+}
+
 export default function App() {
+  const [authed, setAuthed] = useState(loadSession)
   const [state, setState] = useState(() => loadState() ?? INITIAL_STATE)
   const [view, setView] = useState('campaigns')
   const [selectedCampaign, setSelectedCampaign] = useState(null)
+
+  if (!authed) {
+    return (
+      <Login onAuthenticated={() => {
+        try { sessionStorage.setItem('ci_session', 'ok') } catch {}
+        setAuthed(true)
+      }} />
+    )
+  }
 
   const update = (patch) => {
     setState(s => {
@@ -141,6 +156,11 @@ export default function App() {
     setSelectedCampaign(null)
   }
 
+  const handleLogout = () => {
+    try { sessionStorage.removeItem('ci_session') } catch {}
+    setAuthed(false)
+  }
+
   return (
     <AppShell
       view={view}
@@ -149,6 +169,7 @@ export default function App() {
       activeWsId={state.activeWsId}
       onSelectWorkspace={handleSelectWorkspace}
       onAddWorkspace={handleAddWorkspace}
+      onLogout={handleLogout}
     >
       {view === 'campaigns' && !selectedCampaign && (
         <Dashboard
