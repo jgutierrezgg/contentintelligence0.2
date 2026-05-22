@@ -39,10 +39,23 @@ function migrateCampaign(c) {
 }
 
 function migrateWorkspace(ws) {
+  // Migrate old single opportunities object → opportunitySets array
+  let opportunitySets = ws.opportunitySets ?? []
+  if (!ws.opportunitySets && ws.opportunities?.isProcessed && ws.opportunities?.items?.length > 0) {
+    opportunitySets = [{
+      id: 'os_migrated',
+      name: 'Opportunity Analysis',
+      objectives: ws.opportunities.objectives ?? [],
+      createdAt: Date.now(),
+      lastRunAt: Date.now(),
+      items: ws.opportunities.items,
+    }]
+  }
+  const { opportunities: _dropped, ...rest } = ws
   return {
-    ...ws,
+    ...rest,
     campaigns: (ws.campaigns ?? []).map(migrateCampaign),
-    opportunities: ws.opportunities ?? { objectives: [], isProcessed: false, items: [] },
+    opportunitySets,
   }
 }
 
@@ -118,7 +131,7 @@ export default function App() {
           gsc: !!connected.gsc,
           semrush: !!connected.semrush,
         },
-        opportunities: { objectives: [], isProcessed: false, items: [] },
+        opportunitySets: [],
       }
       const next = {
         ...s,
@@ -160,7 +173,7 @@ export default function App() {
   const handleUpdateCampaign       = (u) => { updateWs({ campaigns: ws.campaigns.map(c => c.id === u.id ? u : c) }); setSelectedCampaign(u) }
   const handleCreateCampaign       = (c) => updateWs({ campaigns: [...ws.campaigns, c] })
   const handleToggleConnection     = (id) => updateWs({ connections: { ...ws.connections, [id]: !ws.connections[id] } })
-  const handleUpdateOpportunities  = (patch) => updateWs({ opportunities: { ...(ws.opportunities ?? {}), ...patch } })
+  const handleUpdateOpportunitySets = (sets) => updateWs({ opportunitySets: sets })
 
   // ── Workspace management ─────────────────────────────────────────────────
   const handleAddWorkspace = () => {
@@ -206,8 +219,8 @@ export default function App() {
       )}
       {view === 'opportunities' && (
         <OpportunitiesView
-          opportunities={ws.opportunities}
-          onUpdate={handleUpdateOpportunities}
+          opportunitySets={ws.opportunitySets ?? []}
+          onUpdateSets={handleUpdateOpportunitySets}
           brands={ws.brands}
           onCreateCampaign={handleCreateCampaign}
           onGoToCampaigns={() => { setView('campaigns'); setSelectedCampaign(null) }}
